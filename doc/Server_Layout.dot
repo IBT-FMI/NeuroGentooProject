@@ -1,0 +1,20 @@
+digraph G{
+	compound=true;
+	subgraph cluster0{
+		color=red;
+		node[label=""];
+		tree1[label=".gentoo", shape=ellipse, color=red];
+		tree2[label=".gentoo2", shape=rectangle, color=red];
+	}
+
+	Github[shape=rectangle,color=green,label="Github"];
+	Travis[shape=ellipse, color=blue, Label="Travis CI"];
+	Computer[shape=rectangle, label=".gentoo2"];
+
+	Github -> Travis[color=blue, label=".gentoo"];
+	Travis -> tree1[lhead="cluster0", color=blue, label=".gentoo"];
+	tree1 -> Travis[color=red, label="Stage4.tar.gz"];
+	
+	Computer -> tree2[lhead="cluster0", label=".gentoo2"];
+	tree2 -> Computer[color=red, label="Stage4.tar.gz"];
+}
