@@ -4,12 +4,30 @@ function debug(){
 	echo $@
 }
 
+function cleanup(){
+	debug "Unmounting Stuff"
+	umount gentoo/{dev,proc,sys,usr/portage}
+	
+	debug "unmounting image"
+	umount gentoo/
+	
+	[ -n "$LODEV" ] && losetup -d "$LODEV"
+}
+
+function clean_exit(){
+	trap - ERR
+	cleanup
+	exit 1
+}
+trap clean_exit ERR
+
 GENTOO_MIRROR="http://distfiles.gentoo.org/releases/amd64/autobuilds"
 IMG_SIZE="4G"
 
+NUM_CPU=$(awk '/processor/ {i++} END {print i}' < /proc/cpuinfo)
+
 debug "Generating Image using mirror ${GENTOO_MIRROR}"
 
-set -e
 
 debug "Creating ./gentoo/"
 mkdir gentoo
@@ -35,10 +53,10 @@ mount -t ext4 "${LODEV}p1" gentoo/
 
 
 debug "Fetching which is the newest gentoo stage3"
-file="$(curl "${GENTOO_MIRROR}/latest-stage3-amd64.txt" | sed -n 's/\(\+*\.tar\.bz2\).*/\1/g')"
-filename="${path##*/}"
-debug "it is ${file}, downloading that:"
-curl -c -o "${filename}" "${GENTOO_MIRROR}/${file}"
+file="$(curl "${GENTOO_MIRROR}/latest-stage3-amd64.txt" | sed -n 's/\(\+*\.tar\.bz2\).*/\1/p')"
+filename="${file##*/}"
+debug "it is ${file}, downloading ${GENTOO_MIRROR}/${file} -> ${filename}:"
+[ -f "${filename}" ] || curl -o "${filename}" "${GENTOO_MIRROR}/${file}"
 
 debug "Unpacking archive to ./gentoo/" 
 tar xvjf "${filename}" -C gentoo/
@@ -63,17 +81,17 @@ mount -t sysfs none sys
 popd
 
 
+PKGS="gentoo-sources openssh syslog-ng cloud-init"
 cat <<-EOF > ./gentoo/script.sh
 #!/bin/bash
 
 function debug(){
-	echo $@
+	echo \$@
 }
 
 set -e
 
 
-NUM_CPU=$(awk '/processor/ {i++} END {print i}' < /proc/cpuinfo)
 debug "Setting makeopts to -j$NUM_CPU"
 echo 'MAKEOPTS="-j${NUM_CPU}"' >> /etc/portage/make.conf
 
@@ -86,14 +104,14 @@ emerge -1nq portage
 debug "Updateing world"
 emerge -uNDqv world
 
-PKGS="gentoo-sources openssh syslog-ng cloud-init"
+
 debug "Emerging $PKGS"
 emerge -qv $PKGS
 
 debug "Setting up services"
 for s in sshd syslog-ng cloud-init cloud-final cloud-config cloud-init-local
 do
-	rc-update add $s default
+	rc-update add \$s default
 done
 
 mv kernel.config /usr/src/linux/.config
@@ -124,14 +142,11 @@ cp /usr/share/syslinux/{menu.c32,memdisk,libcom32.c32,libutil.c32} gentoo/boot/e
 debug "Installing extlinux"
 extlinux --device="${LODEV}" --install gentoo/boot/
 
-cat <<-EOF > gentoo/boot/extlinux/
+cat <<-EOF > gentoo/boot/extlinux/extlinux.cfg
 DEFAULT gentoo
 LABEL gentoo
       LINUX /boot/vmlinuz
 EOF
 
-debug "Unmounting Stuff"
-umount gentoo/{dev,proc,sys,usr/portage}
 
-debug "unmounting image"
-umount gentoo/
+cleanup
