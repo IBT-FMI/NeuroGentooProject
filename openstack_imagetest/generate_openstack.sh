@@ -48,7 +48,7 @@ EOF
 debug "Copying syslinux MBR"
 dd if=/usr/share/syslinux/mbr.bin "of=$LODEV" conv=notrunc bs=440 count=1
 partprobe "$LODEV"
-mkfs.ext4 -L NeuroGentoo "${LODEV}p1"
+mkfs.ext4 -O ^64bit -L NeuroGentoo "${LODEV}p1"
 mount -t ext4 "${LODEV}p1" gentoo/
 
 
@@ -100,7 +100,7 @@ echo "UTC" > /etc/timezone
 cp /usr/share/zoneinfo/UTC /etc/localtime
 
 debug "Updateing portage (if necessary)"
-emerge -1nq portage
+emerge -uNq portage
 debug "Updateing world"
 emerge -uNDqv world
 
@@ -136,16 +136,16 @@ debug "Chrooting to ./gentoo/"
 chroot gentoo/ /script.sh
 
 debug "Copying syslinux files"
-mkdir gentoo/boot/extlinux/
-cp /usr/share/syslinux/{menu.c32,memdisk,libcom32.c32,libutil.c32} gentoo/boot/extlinux/
+mkdir gentoo/boot/syslinux
+cp /usr/share/syslinux/{menu.c32,memdisk,libcom32.c32,libutil.c32} gentoo/boot/syslinux/
 
 debug "Installing extlinux"
-extlinux --device="${LODEV}" --install gentoo/boot/
+extlinux --device="${LODEV}p1" --install gentoo/boot/syslinux/
 
-cat <<-EOF > gentoo/boot/extlinux/extlinux.cfg
+cat <<-EOF > gentoo/boot/syslinux/syslinux.cfg
 DEFAULT gentoo
 LABEL gentoo
-      LINUX /boot/vmlinuz
+      LINUX /boot/vmlinuz root=/dev/sda1 rootfstype=ext4
 EOF
 
 
