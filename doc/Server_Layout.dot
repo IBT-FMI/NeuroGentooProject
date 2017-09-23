@@ -1,20 +1,34 @@
 digraph G{
-	compound=true;
-	subgraph cluster0{
-		color=red;
-		node[label=""];
-		tree1[label=".gentoo", shape=ellipse, color=red];
-		tree2[label=".gentoo2", shape=rectangle, color=red];
+	splines=true;
+	rankdir=LR;
+	Github[shape=none,color=black,label="", image="Graph/GitHub.svg", imagescale=true, fixedsize=true];
+	Github2[shape=none,color=black,label="", image="Graph/GitHub.svg", imagescale=true, fixedsize=true];
+	{rank=same;
+	Travis[shape=ellipse, color=blue, label="Travis CI"];
+	Travis2[shape=ellipse, color=blue, label="Travis CI"];
 	}
+	Server[shape=none, margin=0,label=<
+	<table color="red" cellpadding="5">
+		<tr>
+			<td rowspan="3">Common</td>
+			<td port="gentoo">.gentoo</td>
+		</tr>
+		<tr>
+			<td port="gentoo2">.gentoo2</td>
+		</tr>
+		<tr>
+			<td port="gentoo3">.gentoo3</td>
+		</tr>
+	</table>>];
+	Computer[shape=none,label="", image="Graph/Computer.svg"];
 
-	Github[shape=rectangle,color=green,label="Github"];
-	Travis[shape=ellipse, color=blue, Label="Travis CI"];
-	Computer[shape=rectangle, label=".gentoo2"];
-
-	Github -> Travis[color=blue, label=".gentoo"];
-	Travis -> tree1[lhead="cluster0", color=blue, label=".gentoo"];
-	tree1 -> Travis[color=red, label="Stage4.tar.gz"];
+	Github -> Travis[color=green, label=".gentoo"];
+	Github2 -> Travis2[color=green, label=".gentoo3"];
+	Travis -> Server[color=blue, label=".gentoo"];
+	Travis2 -> Server[color=blue, label=".gentoo3"];
+	Server:gentoo -> Travis[color=red, label="docker.img"];
+	Server:gentoo3 -> Travis2[color=red, label="docker3.img"];
 	
-	Computer -> tree2[lhead="cluster0", label=".gentoo2"];
-	tree2 -> Computer[color=red, label="Stage4.tar.gz"];
+	Computer -> Server[label=".gentoo2"];
+	Server:gentoo2 -> Computer[color=red, label="Stage4.tar.gz"];
 }
