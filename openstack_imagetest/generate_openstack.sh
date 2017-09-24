@@ -48,7 +48,16 @@ EOF
 debug "Copying syslinux MBR"
 dd if=/usr/share/syslinux/mbr.bin "of=$LODEV" conv=notrunc bs=440 count=1
 partprobe "$LODEV"
+
+debug "Formatting the disk with ext4"
+
+#Syslinux can't handle 64bit, so we disable it.
+#This has the effect, that our root partition can't grow larger than 2TB
 mkfs.ext4 -O ^64bit -L NeuroGentoo "${LODEV}p1"
+
+UUID="$(dumpe2fs /dev/loop0p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
+
+debug "Mounting the partition under ./gentoo/"
 mount -t ext4 "${LODEV}p1" gentoo/
 
 
@@ -135,6 +144,10 @@ chmod 755 ./gentoo/script.sh
 debug "Chrooting to ./gentoo/"
 chroot gentoo/ /script.sh
 
+KERNEL="$(readlink gentoo/usr/src/linux)"
+KERNELVERSION="${KERNEL%-*}"
+KERNELVERSION="${KERNELVERSION#*-}"
+
 debug "Copying syslinux files"
 mkdir gentoo/boot/syslinux
 cp /usr/share/syslinux/{menu.c32,memdisk,libcom32.c32,libutil.c32} gentoo/boot/syslinux/
@@ -142,11 +155,22 @@ cp /usr/share/syslinux/{menu.c32,memdisk,libcom32.c32,libutil.c32} gentoo/boot/s
 debug "Installing extlinux"
 extlinux --device="${LODEV}p1" --install gentoo/boot/syslinux/
 
+debug "Writing bootloader, booting from UUID $UUID"
 cat <<-EOF > gentoo/boot/syslinux/syslinux.cfg
 DEFAULT gentoo
 LABEL gentoo
-      LINUX /boot/vmlinuz root=/dev/sda1 rootfstype=ext4
+      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4
+      INITRD /boot/initramfs
 EOF
 
+debug "Writing fstab root-entry"
+cat <<-EOF >> gentoo/etc/fstab
+UUID=$UUID		/		ext4		noatime		0 1
+EOF
+
+INITRAMFS="./gentoo/boot/initramfs-$KERNELVERSION"
+debug "Generating initramfs $INITRAMFS"
+dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
+ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
 
 cleanup
