@@ -1,9 +1,15 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]
+if [ "$#" -lt 2 ]
 then
 	echo "OS_USER=<user> OS_PW=<password> OS_TENANT=>tenant> $0 <filename> <imagename>"
 	exit 1
+fi
+
+METHOD="image-create"
+if [ "$3" == "-u" ]
+then
+	METHOD="image-update"
 fi
 
 glance --os-username "$OS_USER" \
@@ -14,5 +20,5 @@ glance --os-username "$OS_USER" \
   image-create \
   --disk-format raw \
   --container-format bare \
-  --file $1 \
-  --name $2
+  --file "$1" \
+  --name "$2"
