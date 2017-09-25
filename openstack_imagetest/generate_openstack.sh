@@ -181,4 +181,6 @@ debug "Generating initramfs $INITRAMFS"
 dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
 ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
 
+echo 'hostname="gentoo"' > gentoo/etc/conf.d/hostname
+
 cleanup
