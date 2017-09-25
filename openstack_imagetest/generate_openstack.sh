@@ -5,6 +5,7 @@ function debug(){
 }
 
 function cleanup(){
+	popd
 	debug "Unmounting Stuff"
 	umount gentoo/{dev,proc,sys,usr/portage}
 	
