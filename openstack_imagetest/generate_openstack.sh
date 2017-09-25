@@ -48,7 +48,7 @@ EOF
 
 debug "Copying syslinux MBR"
 dd if=/usr/share/syslinux/mbr.bin "of=$LODEV" conv=notrunc bs=440 count=1
-partprobe "$LODEV"
+partx -u "$LODEV"
 
 debug "Formatting the disk with ext4"
 
