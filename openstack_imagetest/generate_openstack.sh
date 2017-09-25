@@ -6,6 +6,8 @@ function debug(){
 
 function cleanup(){
 	popd
+	rm gentoo/{kernel.config,script.sh}
+	
 	debug "Unmounting Stuff"
 	umount gentoo/{dev/pts,dev,var/tmp/portage,proc,sys,usr/portage}
 	
