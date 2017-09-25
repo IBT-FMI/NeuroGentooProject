@@ -131,7 +131,7 @@ done
 
 mv kernel.config /usr/src/linux/.config
 pushd /usr/src/linux/
-make alldefconfig
+make defconfig
 make -j${NUM_CPU} 
 make modules_prepare
 make modules_install
