@@ -124,7 +124,7 @@ debug "Emerging $PKGS"
 emerge -qv $PKGS
 
 debug "Setting up services"
-for s in sshd syslog-ng cloud-init cloud-final cloud-config cloud-init-local
+for s in sshd syslog-ng cloud-init
 do
 	rc-update add \$s default
 done
