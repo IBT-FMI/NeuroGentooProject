@@ -56,7 +56,7 @@ debug "Formatting the disk with ext4"
 #This has the effect, that our root partition can't grow larger than 2TB
 mkfs.ext4 -O ^64bit -L NeuroGentoo "${LODEV}p1"
 
-UUID="$(dumpe2fs /dev/loop0p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
+UUID="$(dumpe2fs ${LODEV}p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
 
 debug "Mounting the partition under ./gentoo/"
 mount -t ext4 "${LODEV}p1" gentoo/
