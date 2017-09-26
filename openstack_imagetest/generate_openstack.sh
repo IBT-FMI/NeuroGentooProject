@@ -5,8 +5,9 @@ function debug(){
 }
 
 function cleanup(){
+	popd
 	debug "Unmounting Stuff"
-	umount gentoo/{dev,proc,sys,usr/portage}
+	umount gentoo/{dev/pts,dev,var/tmp/portage,proc,sys,usr/portage}
 	
 	debug "unmounting image"
 	umount gentoo/
@@ -47,7 +48,7 @@ EOF
 
 debug "Copying syslinux MBR"
 dd if=/usr/share/syslinux/mbr.bin "of=$LODEV" conv=notrunc bs=440 count=1
-partprobe "$LODEV"
+partx -u "$LODEV"
 
 debug "Formatting the disk with ext4"
 
@@ -87,6 +88,11 @@ debug "mount proc/"
 mount -t proc none proc
 debug "mount sys/"
 mount -t sysfs none sys
+debug "mount devpts with gid=5 for glibc[-suid] at /dev/pts/"
+mount -t devpts -o gid=5 none dev/pts/
+debug "mount tmpfd on /var/tmp/portage"
+mkdir -p var/tmp/portage
+mount -t tmpfs -o size=4G none var/tmp/portage
 popd
 
 
@@ -118,14 +124,14 @@ debug "Emerging $PKGS"
 emerge -qv $PKGS
 
 debug "Setting up services"
-for s in sshd syslog-ng cloud-init cloud-final cloud-config cloud-init-local
+for s in sshd syslog-ng cloud-init
 do
 	rc-update add \$s default
 done
 
 mv kernel.config /usr/src/linux/.config
 pushd /usr/src/linux/
-make alldefconfig
+make defconfig
 make -j${NUM_CPU} 
 make modules_prepare
 make modules_install
