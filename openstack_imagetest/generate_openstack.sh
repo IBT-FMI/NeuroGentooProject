@@ -123,6 +123,19 @@ emerge -uNDqv world
 debug "Emerging $PKGS"
 emerge -qv $PKGS
 
+debug "Setting up net.eth0"
+rm -f /etc/init.d/net.e*
+ln -s net.lo /etc/init.d/net.eth0
+
+rc-update add net.eth0 default
+
+debug "Hitting udev with a small hammer"
+mkdir /etc/udev/rules.d/ || true
+touch /etc/udev/rules.d/80-net-name-slot.rules 
+
+echo "hostname=\"gentoo\"" > /etc/conf.d/hostname
+
+
 debug "Setting up services"
 for s in sshd syslog-ng cloud-init
 do
@@ -179,14 +192,5 @@ debug "Generating initramfs $INITRAMFS"
 dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
 ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
 
-debug "Setting up net.eth0"
-rm -f gentoo/etc/init.d/net.e*
-ln -s net.lo gentoo/etc/init.d/net.eth0
-
-debug "Hitting udev with a small hammer"
-mkdir gentoo/etc/udev/rules.d/ || true
-touch gentoo/etc/udev/rules.d/80-net-name-slot.rules 
-
-echo "hostname=\"gentoo\"" > gentoo/etc/conf.d/hostname
 
 cleanup
