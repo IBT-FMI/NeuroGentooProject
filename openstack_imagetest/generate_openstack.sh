@@ -179,4 +179,14 @@ debug "Generating initramfs $INITRAMFS"
 dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
 ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
 
+debug "Setting up net.eth0"
+rm -f gentoo/etc/init.d/net.e*
+ln -s net.lo gentoo/etc/init.d/net.eth0
+
+debug "Hitting udev with a small hammer"
+mkdir gentoo/etc/udev/rules.d/ || true
+touch gentoo/etc/udev/rules.d/80-net-name-slot.rules 
+
+echo "hostname=\"gentoo\"" > gentoo/etc/conf.d/hostname
+
 cleanup
