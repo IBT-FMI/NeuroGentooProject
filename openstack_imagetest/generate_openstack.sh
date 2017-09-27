@@ -184,7 +184,7 @@ debug "Writing bootloader, booting from UUID $UUID"
 cat <<-EOF > gentoo/boot/syslinux/syslinux.cfg
 DEFAULT gentoo
 LABEL gentoo
-      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4 console=ttyS0,115200n8 console=tty0
+      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4 console=ttyS0,115200n8
       INITRD /boot/initramfs
 EOF
 
