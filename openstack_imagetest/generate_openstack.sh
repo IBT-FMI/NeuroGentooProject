@@ -58,7 +58,7 @@ debug "Formatting the disk with ext4"
 #This has the effect, that our root partition can't grow larger than 2TB
 mkfs.ext4 -O ^64bit -L NeuroGentoo "${LODEV}p1"
 
-UUID="$(dumpe2fs /dev/loop0p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
+UUID="$(dumpe2fs ${LODEV}p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
 
 debug "Mounting the partition under ./gentoo/"
 mount -t ext4 "${LODEV}p1" gentoo/
@@ -125,6 +125,19 @@ emerge -uNDqv world
 debug "Emerging $PKGS"
 emerge -qv $PKGS
 
+debug "Setting up net.eth0"
+rm -f /etc/init.d/net.e*
+ln -s net.lo /etc/init.d/net.eth0
+
+rc-update add net.eth0 default
+
+debug "Hitting udev with a small hammer"
+mkdir /etc/udev/rules.d/ || true
+touch /etc/udev/rules.d/80-net-name-slot.rules 
+
+echo "hostname=\"gentoo\"" > /etc/conf.d/hostname
+
+
 debug "Setting up services"
 for s in sshd syslog-ng cloud-init
 do
@@ -133,7 +146,7 @@ done
 
 mv kernel.config /usr/src/linux/.config
 pushd /usr/src/linux/
-make defconfig
+make olddefconfig
 make -j${NUM_CPU} 
 make modules_prepare
 make modules_install
@@ -167,7 +180,7 @@ debug "Writing bootloader, booting from UUID $UUID"
 cat <<-EOF > gentoo/boot/syslinux/syslinux.cfg
 DEFAULT gentoo
 LABEL gentoo
-      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4
+      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4 console=ttyS0,115200n8 console=tty0
       INITRD /boot/initramfs
 EOF
 
@@ -180,7 +193,5 @@ INITRAMFS="./gentoo/boot/initramfs-$KERNELVERSION"
 debug "Generating initramfs $INITRAMFS"
 dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
 ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
-
-echo 'hostname="gentoo"' > gentoo/etc/conf.d/hostname
 
 cleanup
