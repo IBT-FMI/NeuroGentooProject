@@ -26,6 +26,7 @@ trap clean_exit ERR
 
 GENTOO_MIRROR="http://distfiles.gentoo.org/releases/amd64/autobuilds"
 IMG_SIZE="4G"
+PASSWORD="t00r"
 
 NUM_CPU=$(awk '/processor/ {i++} END {print i}' < /proc/cpuinfo)
 
@@ -156,6 +157,9 @@ popd
 pushd /boot/
 ln -s vmlinuz-* vmlinuz
 popd
+
+debug "Setting root-password to $PASSWORD"
+chpasswd <<< "root:$PASSWORD"
 
 EOF
 
