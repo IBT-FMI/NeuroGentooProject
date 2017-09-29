@@ -12,7 +12,7 @@ digraph{
 		gentoo1[color=green, label=".gentoo1"];
 		gentoo2[color=green, label=".gentoo2"];
 		{rank=same;
-		docker1_old[color=purple, style=dashed, label="Docker1.img"];
+		#docker1_old[color=purple, style=dashed, label="Docker1.img"];
 		docker1_older[color=purple, style=dotted, label="Docker1.img"];
 		docker1[color=purple, label="Docker1.img"];
 		docker2[color=purple, label="Docker2.img"];
@@ -24,7 +24,7 @@ digraph{
 	Stemtoo -> gentoo1[color=red, label="default/init"];
 	Stemtoo -> gentoo2[color=red, label="default/init"];
 	gentoo1 -> docker1[color=green, label="default/image"];
-	gentoo1 -> docker1_old[style=dashed,color=green, label="default/image"];
+	#gentoo1 -> docker1_old[style=dashed,color=green, label="default/image"];
 	gentoo1 -> docker1_older[style=dotted,color=green, label="default/image"];
 	gentoo2 -> docker2[color=green, label="default/image"];
 	gentoo1 -> gentoo1[color=green, label="default/update"];
