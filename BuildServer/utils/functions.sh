@@ -48,6 +48,7 @@ function cleanup(){
 }
 
 function clean_exit(){
+	ok "Exiting"
 	trap - ERR
 	cleanup
 	exit 0
@@ -56,8 +57,8 @@ function clean_exit(){
 function error_exit(){
 	trap - ERR
 	error "Exiting"
-	error_cleanup
 	cleanup
+	error_cleanup
 	exit 1;
 }
 
