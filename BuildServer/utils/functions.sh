@@ -70,7 +70,7 @@ function normalize_deps(){
 	sed 's/[[:blank:]]\+//;s/#.*//g;/^$/d;' | sort | uniq
 }
 function normalize_overlays(){
-	gawk -f "${ROOT_DIR}/utils/normalize_overlays.gawk" $@
+	"${ROOT_DIR}/utils/normalize_overlays.py" "$@"
 }
 
 function get_dotgentoo_id(){
