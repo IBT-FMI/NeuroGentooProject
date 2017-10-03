@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+debug "Syncing portage tree"
+emerge --sync
