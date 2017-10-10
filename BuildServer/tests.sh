@@ -10,8 +10,8 @@ do
 	then
 		continue
 	fi
-	RET=0
-	. "$TEST"
+	RET=1
+	source "$TEST"
 	if [ $RET -eq 0 ]
 	then
 		ok "$TEST ok"
