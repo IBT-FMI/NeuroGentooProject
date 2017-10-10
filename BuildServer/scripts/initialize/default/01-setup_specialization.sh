@@ -19,3 +19,15 @@ for file in "${ROOT}/../.gentoo/overlays/"*
 do
 	if [ -f "$file" ]; then cp "$file" "${ROOT}/etc/portage/repos.conf/"; fi
 done
+
+for file in "${ROOT}/../.gentoo/package.{use,mask,unmask,keywords}/"*
+do
+	relpath="${file#${ROOT}/../.gentoo/}"
+	dir="${relpath%/*}"
+        if [ -f "$file" ]
+	then
+		mkdir -p "${ROOT}/etc/portage/$dir/"
+		cp "$file" "${ROOT}/etc/portage/$dir/"
+	fi
+done
+

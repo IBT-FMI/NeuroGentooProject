@@ -69,16 +69,34 @@ function chksum(){
 function normalize_deps(){
 	sed 's/[[:blank:]]\+//;s/#.*//g;/^$/d;' | sort | uniq
 }
+
 function normalize_overlays(){
 	"${ROOT_DIR}/utils/normalize_overlays.py" "$@"
 }
 
+function normalize_packagefiles(){
+	type="$1"
+	shift
+	if [ -f "$1" ]
+	then
+		"${ROOT_DIR}/utils/normalize_packagefiles.py" "$type" "$@"
+	fi
+}
+
 function get_dotgentoo_id(){
-	(
-		normalize_deps < "$1"/deps
-		olays=( "$1"/overlays/* )
-		[ -f "${olays[0]}" ] && normalize_overlays ${olays[@]}
-	) | chksum
+	normalize_dotgentoo "$@" | chksum
+}
+function normalize_dotgentoo(){
+	echo "#dependencies"
+	normalize_deps < "$1"/deps
+	echo "#overlays"
+	olays=( "$1"/overlays/* )
+	[ -f "${olays[0]}" ] && normalize_overlays ${olays[@]}
+	for pkgfile in keywords mask unmask use
+	do
+		echo "#$pkgfile"
+		normalize_packagefiles "$pkgfile" "$1/package.$pkgfile"/*
+	done
 }
 
 
