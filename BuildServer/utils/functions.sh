@@ -30,7 +30,7 @@ function on_error(){
 }
 
 function error_cleanup(){
-	debug "Cleaning up"
+	debug "Cleaning up after error"
 	for func in "${_on_error[@]}"
 	do
 		debug "executing $func"
