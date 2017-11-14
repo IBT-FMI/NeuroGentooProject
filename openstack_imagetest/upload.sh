@@ -17,7 +17,7 @@ glance --os-username "$OS_USER" \
   --os-tenant-name "$OS_TENANT" \
   --os-auth-url https://cloud.s3it.uzh.ch:5000/v2.0 \
   --os-image-api-version 2 \
-  image-create \
+  "$METHOD" \
   --disk-format raw \
   --container-format bare \
   --file "$1" \

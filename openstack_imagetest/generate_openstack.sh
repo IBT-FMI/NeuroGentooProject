@@ -6,6 +6,8 @@ function debug(){
 
 function cleanup(){
 	popd
+	rm gentoo/{kernel.config,script.sh}
+	
 	debug "Unmounting Stuff"
 	umount gentoo/{dev/pts,dev,var/tmp/portage,proc,sys,usr/portage}
 	
@@ -24,6 +26,7 @@ trap clean_exit ERR
 
 GENTOO_MIRROR="http://distfiles.gentoo.org/releases/amd64/autobuilds"
 IMG_SIZE="4G"
+PASSWORD="t00r"
 
 NUM_CPU=$(awk '/processor/ {i++} END {print i}' < /proc/cpuinfo)
 
@@ -155,6 +158,9 @@ pushd /boot/
 ln -s vmlinuz-* vmlinuz
 popd
 
+debug "Setting root-password to $PASSWORD"
+chpasswd <<< "root:$PASSWORD"
+
 EOF
 
 
@@ -178,7 +184,7 @@ debug "Writing bootloader, booting from UUID $UUID"
 cat <<-EOF > gentoo/boot/syslinux/syslinux.cfg
 DEFAULT gentoo
 LABEL gentoo
-      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4 console=ttyS0,115200n8 console=tty0
+      LINUX /boot/vmlinuz root=UUID=$UUID rootfstype=ext4 console=ttyS0,115200n8
       INITRD /boot/initramfs
 EOF
 
@@ -191,6 +197,5 @@ INITRAMFS="./gentoo/boot/initramfs-$KERNELVERSION"
 debug "Generating initramfs $INITRAMFS"
 dracut --no-kernel -m "base rootfs-block" "$INITRAMFS" "$KERNELVERSION"
 ln -s "initramfs-$KERNELVERSION" "./gentoo/boot/initramfs"
-
 
 cleanup
