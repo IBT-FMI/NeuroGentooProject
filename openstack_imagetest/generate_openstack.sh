@@ -112,6 +112,10 @@ set -e
 
 debug "Setting makeopts to -j$NUM_CPU"
 echo 'MAKEOPTS="-j${NUM_CPU}"' >> /etc/portage/make.conf
+echo 'CONFIG_PROTECT_MASK="/etc/portage/"' >> /etc/portage/make.conf
+
+debug "Deactivating Bindist"
+sed -i 's/bindist/-bindist/g' /etc/portage/make.conf
 
 debug "Setting timezone to UTC"
 echo "UTC" > /etc/timezone
@@ -120,11 +124,12 @@ cp /usr/share/zoneinfo/UTC /etc/localtime
 debug "Updateing portage (if necessary)"
 emerge -uNq portage
 debug "Updateing world"
-emerge -uNDqv world
+emerge -uNDqv --autounmask-continue=y world
 
 
 debug "Emerging $PKGS"
-emerge -qv $PKGS
+debug emerge --autounmask-continue=y -qv $PKGS
+emerge --autounmask-continue=y -qv $PKGS
 
 debug "Setting up net.eth0"
 rm -f /etc/init.d/net.e*
