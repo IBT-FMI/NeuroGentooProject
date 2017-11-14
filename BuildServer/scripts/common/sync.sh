@@ -1,3 +1,3 @@
 #!/bin/bash
 
-emaint sync -A
+emaint sync -a
