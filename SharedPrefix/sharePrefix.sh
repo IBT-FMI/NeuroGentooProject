@@ -44,4 +44,4 @@ chmod -R g+rw "${EPREFIX}"
 chgrp -R "${GROUP}" "${EPREFIX}"
 find "${EPREFIX}" -type d -exec chmod g+s '{}' '+'
 sed -i 's/RETAIN="/RETAIN="PORTAGE_USERNAME=$USER /; /^EPREFIX/i umask g+rwx' "${SCRIPT}"
-
+echo 'FEATURES="${FEATURES} unprivileged"' >> "${EPREFIX}/etc/portage/make.conf"
