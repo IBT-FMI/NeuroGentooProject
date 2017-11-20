@@ -45,14 +45,15 @@ Specification
 
 We propose a system providing two eclasses, blas.eclass and lapack.eclass.
 These eclasses define:
+
 - a unique name for every BLAS or Lapack implementation
 - a new set of USE flags (``blas_<impl>`` and ``lapack_<impl>``)
-which provide a way for the end-user to select against which version of
-BLAS or Lapack will be linked.
+  which provide a way for the end-user to select against which version of
+  BLAS or Lapack will be linked.
 - the variables ``BLAS_USEDEP`` or ``LAPACK_USEDEP`` which must be included
-	in the USE dependencies on all atoms also inheriting the blas or lapack
-	eclass in DEPEND or RDEPEND. This will enforce the dynamic linking
-	consistency.
+  in the USE dependencies on all atoms also inheriting the blas or lapack
+  eclass in DEPEND or RDEPEND. This will enforce the dynamic linking
+  consistency.
 
 Every package ebuild linking against either BLAS or Lapack will have to
 set a variable ``BLAS_COMPAT`` or ``LAPACK_COMPAT`` (alternatively 
@@ -61,11 +62,12 @@ with any implementation) to specify against which libraries the package
 can be linked (i.e. the compatibility with the implementations), before
 inheriting the eclass.
 Doing this will add:
+
 - a USE flag for every compatible implementation to IUSE
 - the dependencies for the package providing the implementation to DEPEND
-	and RDEPEND
+  and RDEPEND
 - the constraint that only one single implementation USE flag may be set 
-	to REQUIRED_USE.
+  to REQUIRED_USE.
 
 The eclasses export the pkg_setup function, in which they add an overlay
 for package-config in ``${T}/pkgconfig``, that will be prepended to the
@@ -79,20 +81,23 @@ build, the correct library and include paths will be used.
 C Headers
 ---------
 
-Ebuilds can request that the C headers of the re be installed 
+Ebuilds can request that the C headers of the implementation to be installed
+via the variables ``BLAS_USE_CBLAS=1`` or ``LAPACK_USE_LAPACKE=1``
 
 Provider Ebuilds
 ----------------
 
 The providers of BLAS or Lapack implementations must install a package-config
 file in 
+
 - `/usr/lib/pkgconfig/<unique implementation name>.pc`
 
 Backwards Compatibility
 =======================
 
 All ebuilds depending on BLAS or Lapack have to be adapted manually,
-and implementation providers have to be rebuilt.
+and implementation providers have to be rebuilt such that the proper
+package-config files are installed
 
 Copyright
 =========
