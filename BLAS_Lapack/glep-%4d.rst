@@ -55,13 +55,13 @@ These eclasses define:
   eclass in DEPEND or RDEPEND. This will enforce the dynamic linking
   consistency.
 
-Every package ebuild linking against either BLAS or Lapack will have to
-set a variable ``BLAS_COMPAT`` or ``LAPACK_COMPAT`` (alternatively 
-``BLAS_COMPAT_ALL=1`` or ``LAPACK_COMPAT_ALL=1`` that mark compatibility
-with any implementation) to specify against which libraries the package
-can be linked (i.e. the compatibility with the implementations), before
-inheriting the eclass.
-Doing this will add:
+Every package ebuild linking against either BLAS or Lapack can set a 
+variable ``BLAS_COMPAT`` or ``LAPACK_COMPAT`` to specify against which 
+libraries the package can be linked (i.e. the compatibility with the
+implementations), before inheriting the eclass. If unset, compatibility
+with all implementations is assumed.
+
+Inheriting the eclasses will add:
 
 - a USE flag for every compatible implementation to IUSE
 - the dependencies for the package providing the implementation to DEPEND
