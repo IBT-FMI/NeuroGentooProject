@@ -99,7 +99,7 @@ Provider Ebuilds
 ----------------
 
 The providers of BLAS or Lapack implementations must install a package-config
-file in `/usr/lib/pkgconfig/<unique implementation name>.pc`
+file in ``/usr/lib/pkgconfig/<unique implementation name>.pc``
 
 Limitations
 ===========
