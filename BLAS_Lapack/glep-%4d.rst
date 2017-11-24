@@ -92,6 +92,8 @@ USE Flags for Implementations
 
 To specify a set of USE flags for an implementation, ``BLAS_REQ_USE=foo``
 or ``LAPACK_REQ_USE=bar`` can be used.
+These will then be added to the dependencies in ``DEPEND`` and ``RDEPEND``, 
+e.g. ``sci-libs/blas-reference[${BLAS_REQ_USE}]``
 
 Provider Ebuilds
 ----------------
