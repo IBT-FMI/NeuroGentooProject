@@ -23,21 +23,7 @@ Motivation
 Currently, the main portage tree supports only one single system-wide BLAS
 and Lapack implementation, the reference implementations from netlib.
 This is insufficient for high-performance use, since a well-tuned BLAS or
-Lapack implementation is important to save cluster-resources.
-
-Requirements
-============
-
-The following constraints should be satisfied:
-
-Compatibility Specification
-	Packages should be able to specify which implementations of BLAS or
-	Lapack they support in their ebuilds.
-
-Dynamic Linking Consistency
-	If a package links against BLAS or Lapack as well as other packages
-	the whole dependency graph should agree on one single BLAS or Lapack
-	implementation.
+Lapack implementation is important to optimally use cluster-resources.
 
 
 Specification
@@ -50,16 +36,14 @@ These eclasses define:
 - a new set of USE flags (``blas_<impl>`` and ``lapack_<impl>``)
   which provide a way for the end-user to select against which version of
   BLAS or Lapack will be linked.
-- the variables ``BLAS_USEDEP`` or ``LAPACK_USEDEP`` which must be included
-  in the USE dependencies on all atoms also inheriting the blas or lapack
-  eclass in DEPEND or RDEPEND. This will enforce the dynamic linking
-  consistency.
 
 Every package ebuild linking against either BLAS or Lapack can set a 
 variable ``BLAS_COMPAT`` or ``LAPACK_COMPAT`` to specify against which 
 libraries the package can be linked (i.e. the compatibility with the
-implementations), before inheriting the eclass. If unset, compatibility
-with all implementations is assumed.
+implementations) by adding their unique name the space-separated list, or
+an asterisk to specify compatibility with all implementations.
+This has to be done before the eclass is inherited.
+If unset, compatibility with all implementations is assumed.
 
 Inheriting the eclasses will add:
 
@@ -71,10 +55,11 @@ Inheriting the eclasses will add:
 
 The eclasses export the pkg_setup function, in which they add an overlay
 for package-config in ``${T}/pkgconfig``, that will be prepended to the
-package-config environment variable ``PKG_CONFIG_PATH``, which then will
-be exported.
-In this directory the package-config file of the user-selected implementation
-will be linked to a generic name, i.e. ``blas.pc`` or ``lapack.pc``.
+package-config environment variable ``PKG_CONFIG_PATH``.
+This variable will then in turn be exported globally.
+In the overlay directory the package-config file of the user-selected
+implementation will be linked to the generic name, i.e. ``blas.pc`` or
+``lapack.pc``.
 Hence, whenever ``pkg-config`` gets called to resolve blas or lapack during
 build, the correct library and include paths will be used.
 
@@ -82,15 +67,49 @@ C Headers
 ---------
 
 Ebuilds can request that the C headers of the implementation to be installed
-via the variables ``BLAS_USE_CBLAS=1`` or ``LAPACK_USE_LAPACKE=1``
+by prepending ``c:`` to the ``BLAS_COMPAT`` or ``LAPACK_COMPAT`` variable.
+
+\*_COMPAT Variables
+-------------------
+
+These variables have the following grammar:
+
+::
+
+	COMPAT <- HEADER_SPECIFIER " " IMPLEMENTATIONS | IMPLEMENTATIONS
+	HEADER_SPECIFIER <- "fortran:" | "c:"
+	IMPLEMENTATIONS <- IMPLEMENTATION | IMPLEMENTATIONS " " IMPLEMENTATIONS
+	IMPLEMENTATION <- [a-zA-Z_\-]+ | "*"
+
+Conditional Dependency
+----------------------
+
+Using ``BLAS_CONDITIONAL_FLAG=(foo bar)`` or ``LAPACK_CONDITIONAL_FLAG=(foo bar)``,
+the package will only depend on BLAS or Lapack if foo (logical-)or bar are set.
+
+USE Flags for Implementations
+-----------------------------
+
+To specify a set of USE flags for an implementation, ``BLAS_REQ_USE=foo``
+or ``LAPACK_REQ_USE=bar`` can be used.
 
 Provider Ebuilds
 ----------------
 
 The providers of BLAS or Lapack implementations must install a package-config
-file in 
+file in `/usr/lib/pkgconfig/<unique implementation name>.pc`
 
-- `/usr/lib/pkgconfig/<unique implementation name>.pc`
+Limitations
+===========
+
+Limitations of the approach do exist:
+
+- Packages are not guaranteed to use the same BLAS or Lapack implementation
+  that they were linked against at runtime, since we do not enforce a
+  consistent implementation in all dependencies (i.e. package P1 could be
+  linked against BLAS B1 and package P2, which in turn is linked against
+  BLAS B2. Hence the resulting binary has dynamic dependencies to B1 and
+  B2, where one will then overwrite the common symbols of the other)
 
 Backwards Compatibility
 =======================
