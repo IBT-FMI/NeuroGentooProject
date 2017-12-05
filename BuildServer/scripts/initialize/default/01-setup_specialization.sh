@@ -4,7 +4,7 @@ debug "Setting up the target ebuild overlay"
 OVERLAYDIR="${ROOT}/var/buildsrv/overlay"
 ensure_dir "${OVERLAYDIR}"
 EBUILD="$(get_ebuild "${ROOT}/../.gentoo")"
-if [ -z "${#EBUILD}" ]
+if [ -z "${EBUILD}" ]
 then
 	error "No ebuild found in .gentoo"
 	error_exit
