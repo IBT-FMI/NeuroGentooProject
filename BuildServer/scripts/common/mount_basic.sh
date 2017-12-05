@@ -1,20 +1,9 @@
 #!/bin/bash
 
-function unmount_basic(){
-	pushd "${ROOT}"
-	function um(){
-		debug "unmounting $1"
-		umount $1
-	}
-	um dev/pts
-	um dev
-	um proc
-	um sys
-	um var/tmp/portage
-	popd
-}
-export -f unmount_basic
-on_exit unmount_basic
+for file in dev dev/pts proc sys var/tmp/portage
+do
+	on_exit "umount \"${ROOT}/$file\""
+done
 
 pushd "${ROOT}"
 debug "bind-mount /dev to dev/"
