@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 debug "Updating portage"
 emerge -uNqv portage
 debug "Updating system & world"
