@@ -40,8 +40,13 @@ then
 	exit 1
 fi
 
+echo "Making prefix group-read/writeable"
 chmod -R g+rw "${EPREFIX}"
+echo "changing group of prefix to ${GROUP}"
 chgrp -R "${GROUP}" "${EPREFIX}"
-find "${EPREFIX}" -type d -exec chmod g+s '{}' '+'
-sed -i 's/RETAIN="/RETAIN="PORTAGE_USERNAME=$USER /; /^EPREFIX/i umask g+rwx' "${SCRIPT}"
-
+echo "Setting the sticky-bit in prefix"
+find "${EPREFIX}" -type d -exec chmod +s '{}' '+'
+echo "Modifying the start_gentoo script ${SCRIPT}"
+sed -i 's/RETAIN="/RETAIN="PORTAGE_USERNAME=$USER PORTAGE_GRPNAME=gentoo/; /^EPREFIX/i umask g+rwx' "${SCRIPT}"
+echo "Adding FEATURES=unprivileged to make.conf"
+echo 'FEATURES="${FEATURES} unprivileged"' >> "${EPREFIX}/etc/portage/make.conf"
