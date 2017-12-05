@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for file in dev dev/pts proc sys var/tmp/portage
+for file in dev dev/pts proc sys var/tmp/portage tmp
 do
 	on_exit "umount \"${ROOT}/$file\""
 done
@@ -17,4 +17,6 @@ mount -t devpts -o gid=5 none dev/pts/
 debug "mount tmpfd on /var/tmp/portage"
 mkdir -p var/tmp/portage
 mount -t tmpfs -o size=6G none var/tmp/portage
+debug "mounting tmpfs on /tmp/"
+mount -t tmpfs -o size=1G none tmp
 popd
