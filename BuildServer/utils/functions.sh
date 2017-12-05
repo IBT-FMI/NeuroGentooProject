@@ -100,18 +100,13 @@ function normalize_dotgentoo(){
 	done
 }
 
-
-function exec_scripts(){
-	debug "executing scripts"
-	STAGE="$1"
-	MACHINE="$2"
-	MACHINETYPE="${3:-default}"
-	ROOT="$PWD/roots/$MACHINE/root"
-	export STAGE MACHINE MACHINETYPE ROOT
-	debug "Executing $STAGE scripts for machine $MACHINE of type $MACHINETYPE"
-	for script in "$ROOT_DIR/scripts/$STAGE/$MACHINETYPE/"*
+function exec_script_files(){
+	for script in "$@" 
 	do
-		if [ ! -x "$script" ]
+		if [ -d "$script" ]
+		then
+			exec_script_files "$script/"*
+		elif [ ! -x "$script" ]
 		then
 			continue;
 		fi
@@ -125,10 +120,34 @@ function exec_scripts(){
 			rm "${ROOT}/script.sh"
 			echo "chroot done $RETVAL"
 		else
+			export ROOT
 			. "$script"
 		fi
 
 	done
+
+}
+
+function exec_scripts(){
+	debug "executing scripts"
+	STAGE="$1"
+	MACHINE="$2"
+	MACHINETYPE="${3:-default}"
+	ROOT="$PWD/roots/$MACHINE/root"
+	export STAGE MACHINE MACHINETYPE ROOT
+	debug "Executing $STAGE scripts for machine $MACHINE of type $MACHINETYPE"
+	HOOKDIR="$ROOT/../scripts/$STAGE"
+	PREDIR="${HOOKDIR}/pre"
+	POSTDIR="${HOOKDIR}/post"
+	if [ -d "$PREDIR" ]
+	then
+		exec_script_files "${PREDIR}/"*
+	fi
+	exec_script_files "$ROOT_DIR/scripts/$STAGE/$MACHINETYPE/"*
+	if [ -d "$POSTDIR" ]
+	then
+		exec_script_files "${POSTDIR}/"*
+	fi
 }
 
 
