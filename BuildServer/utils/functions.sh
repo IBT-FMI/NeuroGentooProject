@@ -2,6 +2,7 @@
 
 ROOT_DIR="$(realpath "$(dirname "$0")")"
 CACHE="${ROOT_DIR}/cache/"
+export NUM_CPU="$(grep -c processor /proc/cpuinfo)"
 
 function debug(){
 	echo "$@">&2
