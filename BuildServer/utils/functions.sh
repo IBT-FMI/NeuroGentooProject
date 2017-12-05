@@ -87,9 +87,21 @@ function normalize_packagefiles(){
 function get_dotgentoo_id(){
 	normalize_dotgentoo "$@" | chksum
 }
+
+function get_ebuild(){
+	for file in "$1"/*.ebuild "$1"/*/*.ebuild
+	do
+		if [ -f "$file" ]
+		then
+			echo "$file"
+			break
+		fi
+	done
+}
+
 function normalize_dotgentoo(){
-	echo "#dependencies"
-	normalize_deps < "$1"/deps
+	echo "#ebuild"
+	cat "$(get_ebuild "$1")"
 	echo "#overlays"
 	olays=( "$1"/overlays/* )
 	[ -f "${olays[0]}" ] && normalize_overlays ${olays[@]}

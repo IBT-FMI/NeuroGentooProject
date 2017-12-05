@@ -1,23 +1,16 @@
 #!/bin/bash
 
 debug "Setting up the target ebuild overlay"
-_EBUILDS=(  "${ROOT}/../.gentoo/"*.ebuild "${ROOT}/../.gentoo/"*/*.ebuild )
 OVERLAYDIR="${ROOT}/var/buildsrv/overlay"
 ensure_dir "${OVERLAYDIR}"
-EBUILDS=()
-for e in "${_EBUILDS[@]}"
-do
-	if [ -f "${e}" ]
-	then
-		EBUILDS=( "${EBUILDS[@]}" "$e" )
-	fi
-done
-if [ "${#EBUILDS[@]}" -eq "0" ]
+EBUILD="$(get_ebuild "${ROOT}/../.gentoo")"
+if [ - z "${#EBUILD}" ]
 then
 	error "No ebuild found in .gentoo"
 	error_exit
 fi
-debug "Using ${EBUILDS[0]}"
+
+debug "Using ebuild $EBUILD"
 debug "Setting up buildserver-overlay in ${OVERLAYDIR}"
 ensure_dir "${OVERLAYDIR}"
 ensure_dir "${OVERLAYDIR}/profiles"
@@ -29,7 +22,7 @@ masters = gentoo
 EOF
 echo buildserver-specialization >> "${OVERLAYDIR}/profiles/categories"
 echo buildserver-specialization >> "${OVERLAYDIR}/profiles/repo_name"
-cp "${EBUILDS[0]}" "${OVERLAYDIR}/buildserver-specialization/specialization/specialization-9999.ebuild"
+cp "${EBUILD}" "${OVERLAYDIR}/buildserver-specialization/specialization/specialization-9999.ebuild"
 ebuild "${OVERLAYDIR}/buildserver-specialization/specialization/specialization-9999.ebuild" manifest
 
 debug "Setting up the additional repos"
