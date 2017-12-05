@@ -27,7 +27,7 @@ function on_exit(){
 }
 
 function on_error(){
-	_on_error=( "${"$1" _on_error[@]}" )
+	_on_error=( "$1" "${_on_error[@]}" )
 }
 
 function error_cleanup(){
