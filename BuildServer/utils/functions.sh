@@ -89,14 +89,7 @@ function get_dotgentoo_id(){
 }
 
 function get_ebuild(){
-	for file in "$1"/*.ebuild "$1"/*/*.ebuild
-	do
-		if [ -f "$file" ]
-		then
-			echo "$file"
-			break
-		fi
-	done
+	find "$1" -name "*.ebuild" -print -quit 
 }
 
 function normalize_dotgentoo(){
