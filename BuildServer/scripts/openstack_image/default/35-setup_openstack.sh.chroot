@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+debug "Emerging openstack packages $OPENSTACK_PKGS"
+emerge --autounmask-continue=y -qv $OPENSTACK_PKGS
+
+debug "Setting timezone to UTC"
+echo "UTC" > /etc/timezone
+cp /usr/share/zoneinfo/UTC /etc/localtime
+
+debug "Setting up net.eth0"
+rm -f /etc/init.d/net.e*
+ln -s net.lo /etc/init.d/net.eth0
+
+rc-update add net.eth0 default                                   
+
+debug "Hitting udev with a small hammer"                       
+mkdir /etc/udev/rules.d/ || true                               
+touch /etc/udev/rules.d/80-net-name-slot.rules                 
+
+echo "hostname=\"gentoo\"" > /etc/conf.d/hostname              
+
+
+debug "Setting up services"    
+for s in sshd syslog-ng cloud-init
+do
+        rc-update add $s default
+done
+
+mv kernel.config /usr/src/linux/.config                        
+pushd /usr/src/linux/          
+make olddefconfig              
+make -j${NUM_CPU}              
+make modules_prepare           
+make modules_install           
+make install
+popd
+
+pushd /boot/
+ln -s vmlinuz-* vmlinuz
+popd
+
+debug "Setting root-password to $OPENSTACK_ROOT_PASSWORD"
+chpasswd <<< "root:$OPENSTACK_ROOT_PASSWORD"
+

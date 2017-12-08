@@ -2,6 +2,7 @@
 
 ROOT_DIR="$(realpath "$(dirname "$0")")"
 CACHE="${ROOT_DIR}/cache/"
+export NUM_CPU="$(grep -c processor /proc/cpuinfo)"
 
 function debug(){
 	echo "$@">&2
@@ -22,11 +23,11 @@ declare -a _on_error;
 export -f debug error
 
 function on_exit(){
-	_on_exit=( "${_on_exit[@]}" "$1" )
+	_on_exit=( "$1" "${_on_exit[@]}")
 }
 
 function on_error(){
-	_on_error=( "${_on_error[@]}" "$1" )
+	_on_error=( "$1" "${_on_error[@]}" )
 }
 
 function error_cleanup(){
@@ -86,9 +87,14 @@ function normalize_packagefiles(){
 function get_dotgentoo_id(){
 	normalize_dotgentoo "$@" | chksum
 }
+
+function get_ebuild(){
+	find "$1" -name "*.ebuild" -print -quit 
+}
+
 function normalize_dotgentoo(){
-	echo "#dependencies"
-	normalize_deps < "$1"/deps
+	echo "#ebuild"
+	cat "$(get_ebuild "$1")"
 	echo "#overlays"
 	olays=( "$1"/overlays/* )
 	[ -f "${olays[0]}" ] && normalize_overlays ${olays[@]}
@@ -99,18 +105,13 @@ function normalize_dotgentoo(){
 	done
 }
 
-
-function exec_scripts(){
-	debug "executing scripts"
-	STAGE="$1"
-	MACHINE="$2"
-	MACHINETYPE="${3:-default}"
-	ROOT="$PWD/roots/$MACHINE/root"
-	export STAGE MACHINE MACHINETYPE ROOT
-	debug "Executing $STAGE scripts for machine $MACHINE of type $MACHINETYPE"
-	for script in "$ROOT_DIR/scripts/$STAGE/$MACHINETYPE/"*
+function exec_script_files(){
+	for script in "$@" 
 	do
-		if [ ! -x "$script" ]
+		if [ -d "$script" ]
+		then
+			exec_script_files "$script/"*
+		elif [ ! -x "$script" ]
 		then
 			continue;
 		fi
@@ -124,10 +125,34 @@ function exec_scripts(){
 			rm "${ROOT}/script.sh"
 			echo "chroot done $RETVAL"
 		else
+			export ROOT
 			. "$script"
 		fi
 
 	done
+
+}
+
+function exec_scripts(){
+	debug "executing scripts"
+	STAGE="$1"
+	MACHINE="$2"
+	MACHINETYPE="${3:-default}"
+	ROOT="$PWD/roots/$MACHINE/root"
+	export STAGE MACHINE MACHINETYPE ROOT
+	debug "Executing $STAGE scripts for machine $MACHINE of type $MACHINETYPE"
+	HOOKDIR="$ROOT/../scripts/$STAGE"
+	PREDIR="${HOOKDIR}/pre"
+	POSTDIR="${HOOKDIR}/post"
+	if [ -d "$PREDIR" ]
+	then
+		exec_script_files "${PREDIR}/"*
+	fi
+	exec_script_files "$ROOT_DIR/scripts/$STAGE/$MACHINETYPE/"*
+	if [ -d "$POSTDIR" ]
+	then
+		exec_script_files "${POSTDIR}/"*
+	fi
 }
 
 
