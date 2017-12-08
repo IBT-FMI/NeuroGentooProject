@@ -13,3 +13,4 @@ do
 	mkdir -p "${dir}"
 	ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so* 
 done
+cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
