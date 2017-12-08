@@ -1,16 +1,17 @@
 #!/bin/bash
 
-EPREFIX=${1:-${SCRATCH}/gentoo}
+set -e
 
-cat >>~/.bashrc <<-EOF
-export -n LD_LIBRARY_PATH
-unset LD_LIBRARY_PATH
-EOF
+if [[ "$1" == "-h" -o "$1" == "--help" ]]
+then
+	echo "Usage: $0 [/path/to/prefix]"
+	exit 0
+fi
 
-for b in 32 64
-do
-	dir="${EPREFIX}/lib${b}/"
-	mkdir -p "${dir}"
-	ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so* 
-done
-cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
+EPREFIX="${1:-${SCRATCH}/gentoo}"
+
+"${0%/*}/prepare_euler.sh" "${EPREFIX}"
+cd "$SCRATCH"
+wget "https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh"
+chmod a+x bootstrap-rap.sh
+./bootstrap-rap.sh "${EPREFIX}" "noninteractive"
