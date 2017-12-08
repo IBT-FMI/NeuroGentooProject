@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 EPREFIX=${1:-${SCRATCH}/gentoo}
 
 cat >>~/.bashrc <<-EOF
@@ -13,4 +15,6 @@ do
 	mkdir -p "${dir}"
 	ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so* 
 done
+
+mkdir "${EPREFIX}/etc"
 cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
