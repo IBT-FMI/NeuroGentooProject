@@ -1,0 +1,2 @@
+#Allow foobar to be installed even if it isn't explicitely stable on amd64
+app-misc/foobar ~amd64

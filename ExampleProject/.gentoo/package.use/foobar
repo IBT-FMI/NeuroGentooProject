@@ -1,0 +1,2 @@
+#Build foobar with the "reverse" option
+app-misc/foobar reverse
