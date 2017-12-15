@@ -1,0 +1,10 @@
+before_install:
+  - docker pull dockerhubuser/dockerhubrepo
+  - docker create --name "reponame" --rm -ti -v "${PWD}":/home/reponame dockerhubuser/dockerhubrepo
+  - docker start reponame
+  - docker exec reponame emaint sync -a
+  - docker exec reponame /home/reponame/.gentoo/install.sh -o
+install:
+  - docker exec reponame sh -c 'FEATURES="-test" /home/reponame/.gentoo/install.sh'
+script: 
+  - docker exec reponame sh -c 'FEATURES="test" /home/reponame/.gentoo/install.sh'
