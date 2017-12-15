@@ -23,7 +23,7 @@ declare -a _on_error;
 export -f debug error
 
 function on_exit(){
-	_on_exit=( "$1" "${_on_exit[@]}")
+	_on_exit=( "$1" "${_on_exit[@]}" )
 }
 
 function on_error(){
@@ -128,7 +128,6 @@ function exec_script_files(){
 			export ROOT
 			. "$script"
 		fi
-
 	done
 
 }
@@ -168,5 +167,6 @@ function ensure_dir(){
 		error_exit
 	fi
 }
+set -o pipefail
 set -E
 trap error_exit ERR

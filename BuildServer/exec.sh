@@ -18,5 +18,15 @@ then
 fi
 
 exec_scripts "$2" "$ID" "$MACHINETYPE"
-
-clean_exit
+ok "Finished succesfully"
+trap - ERR
+cleanup
+CHAINFILE="roots/$ID/actionchain/post/$2"
+echo "$CHAINFILE"
+if [ -f "${CHAINFILE}" ]
+then
+	while read action
+	do
+		"$0" "$1" "$action" "$3"
+	done < "${CHAINFILE}"
+fi
