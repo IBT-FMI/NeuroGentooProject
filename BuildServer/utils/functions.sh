@@ -167,5 +167,6 @@ function ensure_dir(){
 		error_exit
 	fi
 }
+set -o pipefail
 set -E
 trap error_exit ERR
