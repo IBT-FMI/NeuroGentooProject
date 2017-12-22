@@ -3,7 +3,7 @@
 debug "Allocating ${OPENSTACK_IMAGE_SIZE}G for $OPENSTACK_IMAGE"
 
 fallocate -l "${OPENSTACK_IMAGE_SIZE}G" "${OPENSTACK_IMAGE}"
-on_error "rm ${OPENSTACK_IMAGE}"
+if [[ -v DELETE_ON_FAIL ]]; then on_error "rm ${OPENSTACK_IMAGE}"; fi
 
 debug "Setting up loopback"
 OPENSTACK_IMG_LODEV="$(losetup --show -f "${OPENSTACK_IMAGE}")"
@@ -24,6 +24,6 @@ debug "Formatting the disk with ext4"
 
 #Syslinux can't handle 64bit, so we disable it.
 #This has the effect, that our root partition can't grow larger than 2TB
-mkfs.ext4 -O ^64bit -L NeuroGentoo "${OPENSTACK_IMG_LODEV}p1"
+"mkfs.${OPENSTACK_FILESYSTEM}" -O ^64bit -L NeuroGentoo "${OPENSTACK_IMG_LODEV}p1"
 
-OPENSTACK_IMG_UUID="$(dumpe2fs ${OPENSTACK_IMG_LODEV}p1 | sed -n 's/.*UUID:[[:space:]]\+\([a-z0-9\-]\+\).*/\1/p')"
+OPENSTACK_IMG_UUID="$(blkid ${OPENSTACK_IMG_LODEV}p1 | sed -n 's/.*UUID="\([a-z0-9\-]\+\)".*/\1/p')"

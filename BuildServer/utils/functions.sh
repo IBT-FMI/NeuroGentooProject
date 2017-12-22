@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ROOT_DIR="$(realpath "$(dirname "$0")")"
-CACHE="${ROOT_DIR}/cache/"
 export NUM_CPU="$(grep -c processor /proc/cpuinfo)"
 
 function debug(){
@@ -30,6 +28,14 @@ function on_error(){
 	_on_error=( "$1" "${_on_error[@]}" )
 }
 
+function error_pop(){
+	_on_error=( "${_on_error[@]:1}" )
+}
+
+function exit_pop(){
+	_on_exit=( "${_on_exit[@]:1}" )
+}
+
 function error_cleanup(){
 	debug "Cleaning up after error"
 	for func in "${_on_error[@]}"
@@ -40,6 +46,7 @@ function error_cleanup(){
 }
 
 function cleanup(){
+	trap - ERR
 	debug "Cleaning up"
 	for func in "${_on_exit[@]}"
 	do
@@ -49,8 +56,8 @@ function cleanup(){
 }
 
 function clean_exit(){
-	ok "Exiting"
 	trap - ERR
+	ok "Exiting"
 	cleanup
 	exit 0
 }
@@ -105,6 +112,14 @@ function normalize_dotgentoo(){
 	done
 }
 
+function stdin_stderr_redirect() {
+	exec 3>&1 4>&2 1> >(tee "$1") 2>&1
+}
+
+function stdin_stderr_restore() {
+	exec 1>&3 3>- 2>&4 4>-
+}
+
 function exec_script_files(){
 	for script in "$@" 
 	do
@@ -116,6 +131,8 @@ function exec_script_files(){
 			continue;
 		fi
 		debug "Executing ${script#$ROOT_DIR/scripts/}"
+		ensure_dir "${LOG_DIR}/$MACHINE/$STAGE/"
+		stdin_stderr_redirect "${LOG_DIR}/${script##*/}.log"
 		if [ "${script##*\.}" == "chroot" ]
 		then
 			export -n ROOT
@@ -128,19 +145,34 @@ function exec_script_files(){
 			export ROOT
 			. "$script"
 		fi
+		stdin_stderr_restore
 	done
 
 }
 
+function load_config(){
+	for file in "$1"/*.conf
+	do
+		if [ -f "$file" ]
+		then
+			source "$file"
+		fi
+	done
+}
+
 function exec_scripts(){
-	debug "executing scripts"
 	STAGE="$1"
 	MACHINE="$2"
 	MACHINETYPE="${3:-default}"
 	ROOT="$PWD/roots/$MACHINE/root"
 	export STAGE MACHINE MACHINETYPE ROOT
+
+	debug "Loading global configuration"
+	load_config "${ROOT_DIR}/config/"
+	debug "Loading configuration of machine $MACHINE"
+	load_config "${ROOT}/../config/"
 	debug "Executing $STAGE scripts for machine $MACHINE of type $MACHINETYPE"
-	HOOKDIR="$ROOT/../scripts/$STAGE"
+	HOOKDIR="$ROOT/../hooks/$STAGE"
 	PREDIR="${HOOKDIR}/pre"
 	POSTDIR="${HOOKDIR}/post"
 	if [ -d "$PREDIR" ]
@@ -170,3 +202,4 @@ function ensure_dir(){
 set -o pipefail
 set -E
 trap error_exit ERR
+

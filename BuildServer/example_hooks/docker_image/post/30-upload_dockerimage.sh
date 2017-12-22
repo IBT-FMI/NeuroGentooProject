@@ -1,6 +1,10 @@
 #!/bin/bash
 
 TAG="buffepva/repositorg:${DOCKER_BUILDID}"
+LATEST_TAG="buffepva/repositorg:latest"
 
-docker tag "${DOCKER_TAG}" "${TAG}"
-docker push "${TAG}"
+for tag in "$TAG" "$LATEST_TAG"
+do
+	docker tag "${DOCKER_TAG}" "${tag}"
+	docker push "${tag}"
+done
