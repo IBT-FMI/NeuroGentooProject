@@ -3,7 +3,7 @@
 
 The .gentoo-folder is a new approach of bundling a Gentoo ebuild (see the Package Manager Specification [PMS]) with your software.
 It is a simple directory containing:
-* A 99999-ebuild in a valid Portage Tree structure, i.e. `.gentoo/cate-gory/pkgname/pkgname-99999.ebuild`
+* A 99999-ebuild in a valid Portage Tree structure, i.e. `.gentoo/category-name/pkgname/pkgname-99999.ebuild`
 * `package.mask/` `package.keywords/` `package.use/` and `package.unmask/`
 * `overlays/`, which contains additionally required overlays in the same format as `/etc/portage/repos.conf/`
 
