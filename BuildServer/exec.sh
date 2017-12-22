@@ -11,9 +11,9 @@ else
 	ID="$(get_dotgentoo_id "$1")"
 fi
 
-if [ "$2" == "initialize" -a -n "roots/$ID" ]
+if [ "$2" == "initialize" -a "$MACHINETYPE" != "stemgentoo" ]
 then
-	mkdir "roots/$ID"
+	ensure_dir "roots/$ID"
 	cp -r "$1" "roots/$ID/.gentoo"
 fi
 
