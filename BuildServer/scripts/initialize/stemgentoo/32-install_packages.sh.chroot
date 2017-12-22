@@ -1,4 +1,0 @@
-#!/bin/bash
-
-#For (maybe) fetching repos inside the specializatized roots later
-emerge -qv dev-vcs/git dev-vcs/mercurial dev-vcs/subversion dev-vcs/cvs
