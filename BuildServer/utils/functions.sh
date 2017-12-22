@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Where are all our scripts and stuff?
+ROOT_DIR="$(realpath "$(dirname "$0")")"
+
+#Where do we cache certain files?
+CACHE="${ROOT_DIR}/cache/"
+
 export NUM_CPU="$(grep -c processor /proc/cpuinfo)"
 
 function debug(){
@@ -117,11 +123,12 @@ function stdin_stderr_redirect() {
 }
 
 function stdin_stderr_restore() {
-	exec 1>&3 3>- 2>&4 4>-
+	exec 1>&3 3>&- 2>&4 4>&-
 }
 
 function exec_script_files(){
-	for script in "$@" 
+	debug "executing scripts $*"
+	for script in "$@"
 	do
 		if [ -d "$script" ]
 		then
@@ -131,7 +138,7 @@ function exec_script_files(){
 			continue;
 		fi
 		debug "Executing ${script#$ROOT_DIR/scripts/}"
-		ensure_dir "${LOG_DIR}/$MACHINE/$STAGE/"
+		ensure_dir "${LOG_DIR}/"
 		stdin_stderr_redirect "${LOG_DIR}/${script##*/}.log"
 		if [ "${script##*\.}" == "chroot" ]
 		then
