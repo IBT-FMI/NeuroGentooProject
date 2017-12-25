@@ -1,0 +1,11 @@
+digraph{
+	P1 -> D1[color="chartreuse"];
+	P1 -> D2[color="purple"];
+	subgraph cluster0{
+		label="BLAS"
+		B1[color="chartreuse"];
+		B2[color="purple"];
+	}
+	D1 -> B1[color="chartreuse"];
+	D2 -> B2[color="purple"];
+}

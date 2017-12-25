@@ -65,7 +65,7 @@ Inside this functions we do certain cleanup tasks and exit with a non-zero statu
 The cleanup-tasks get defined by the script. 
 
 Configuration
-=============
+-------------
 
 Configuration files are shell-scripts that end in `.conf`.
 They get sourced just before executing the command scripts.
@@ -73,14 +73,14 @@ The following directories are searched for `.conf` files.
 * `config/` in the build-server root
 * `roots/<ID>/config/`
 
-Chroot
-------
+### Chroot-configuration
+
 
 If you want to use these configuration parameters inside a chrootet script, 
 make sure to export them into the environment variables first!
 
 Hooks
-=====
+-----
 
 The images allow for configuration inside their directories.
 
@@ -89,16 +89,17 @@ There are two types of hooks:
 * pre and post command hooks: these are additional scripts executed in a command
 * command chains: these allow executing another command after one has finished 
 
-Pre and Post Hooks
-------------------
+![Hooks and Command-Chains](graph/Scripts.png)
+
+### Pre and Post Hooks
+
 
 Images can hook into the commands via `roots/<ID>/hooks/<command>/pre`
 and `post`.
 Everything in `pre` gets executed before the scripts in `hooks/<command>/<machinetype>`, 
 everything in `post` afterwords.
 
-Command-Chaining
-----------------
+### Command-Chaining
 
 If you wish to execute a command after another command has finished, you can specify that via `roots/<ID>/hooks/<command>/chain`
 which is a file containing all the commands that should be executed after `command`.
@@ -106,7 +107,7 @@ Every command should stand in its own line (`\n`-separated)
 
 
 Logging
-=======
+-------
 
 Logging is done in the directory specified in the config files
 By default, this has the form `roots/<ID>/logs/<command>/`

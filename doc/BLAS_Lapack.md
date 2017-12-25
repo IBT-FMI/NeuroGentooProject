@@ -1,11 +1,18 @@
-Abstract
-========
+BLAS and Lapack Eclasses
+========================
 
-This GLEP proposes a solution to manage the selection of BLAS and Lapack
-implementations at build time.
+Eclasses are ways for reducing code-duplication inside ebuilds.
+They can be understood as libraries for ebuild-writing, providing methods common to many ebuilds.
+
+The line
+```
+inherit <eclass>
+```
+
+Loads all definitions and functions from `<eclass>.eclass`, such that they can be used inside the ebuild.
 
 Motivation
-==========
+----------
 
 Currently, the main portage tree supports only one single system-wide BLAS
 and Lapack implementation, the reference implementations from netlib.
@@ -14,7 +21,7 @@ Lapack implementation is important to optimally use cluster-resources.
 
 
 Specification
-=============
+-------------
 
 We propose a system providing two eclasses, blas.eclass and lapack.eclass.
 These eclasses define:
@@ -50,14 +57,13 @@ implementation will be linked to the generic name, i.e. `blas.pc` or
 Hence, whenever `pkg-config` gets called to resolve blas or lapack during
 build, the correct library and include paths will be used.
 
-C Headers
----------
+### C Headers
 
 Ebuilds can request that the C headers of the implementation to be installed
 by prepending `c:` to the `BLAS_COMPAT` or `LAPACK_COMPAT` variable.
 
-\*_COMPAT Variables
--------------------
+### \*_COMPAT Variables
+
 
 These variables have the following grammar:
 
@@ -66,48 +72,40 @@ These variables have the following grammar:
 	IMPLEMENTATIONS <- IMPLEMENTATION | IMPLEMENTATIONS " " IMPLEMENTATIONS
 	IMPLEMENTATION <- [a-zA-Z_\-]+ | "*"
 
-Conditional Dependency
-----------------------
+### Conditional Dependency
+
 
 Using `BLAS_CONDITIONAL_FLAG=(foo bar)` or `LAPACK_CONDITIONAL_FLAG=(foo bar)`,
 the package will only depend on BLAS or Lapack if foo (logical-)or bar are set.
 
-USE Flags for Implementations
------------------------------
+### USE Flags for Implementations
 
 To specify a set of USE flags for an implementation, `BLAS_REQ_USE=foo`
 or `LAPACK_REQ_USE=bar` can be used.
 These will then be added to the dependencies in `DEPEND` and `RDEPEND`, 
 e.g. `sci-libs/blas-reference[${BLAS_REQ_USE}]`
 
-Provider Ebuilds
-----------------
+### Provider Ebuilds
 
 The providers of BLAS or Lapack implementations must install a package-config
 file in `/usr/lib/pkgconfig/<unique implementation name>.pc`
 
 Limitations
-===========
+-----------
 
 Limitations of the approach do exist:
 
 - Packages are not guaranteed to use the same BLAS or Lapack implementation
   that they were linked against at runtime, since we do not enforce a
-  consistent implementation in all dependencies (i.e. package P1 could be
-  linked against BLAS B1 and package P2, which in turn is linked against
-  BLAS B2. Hence the resulting binary has dynamic dependencies to B1 and
-  B2, where one will then overwrite the common symbols of the other)
+  consistent implementation in all dependencies.
+  Consider the figure below. The package P1 is dynamically linked against both BLAS B1 and B2.
+  When we start the binary of P1, B1 will overwrite B2 or vice versa.
+
+![BLAS conflict](graph/BLAS_Conflict.png)
 
 Backwards Compatibility
-=======================
+-----------------------
 
 All ebuilds depending on BLAS or Lapack have to be adapted manually,
 and implementation providers have to be rebuilt such that the proper
 package-config files are installed
-
-Copyright
-=========
-
-This work is licensed under the Creative Commons Attribution-ShareAlike 3.0
-Unported License.  To view a copy of this license, visit
-http://creativecommons.org/licenses/by-sa/3.0/.

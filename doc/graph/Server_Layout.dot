@@ -1,8 +1,8 @@
 digraph G{
 	splines=true;
 	rankdir=LR;
-	Github[shape=none,color=black,label="", image="Graph/GitHub.svg", imagescale=true, fixedsize=true];
-	Github2[shape=none,color=black,label="", image="Graph/GitHub.svg", imagescale=true, fixedsize=true];
+	Github[shape=none,color=black,label="", image="../img/GitHub.svg", imagescale=true, fixedsize=true];
+	Github2[shape=none,color=black,label="", image="../img/GitHub.svg", imagescale=true, fixedsize=true];
 	{rank=same;
 	Travis[shape=ellipse, color=blue, label="Travis CI"];
 	Travis2[shape=ellipse, color=blue, label="Travis CI"];
@@ -20,7 +20,7 @@ digraph G{
 			<td port="gentoo3">.gentoo3</td>
 		</tr>
 	</table>>];
-	Computer[shape=none,label="", image="Graph/Computer.svg"];
+	Computer[shape=none,label="", image="../img/Computer.svg"];
 
 	Github -> Travis[color=green, label=".gentoo"];
 	Github2 -> Travis2[color=green, label=".gentoo3"];

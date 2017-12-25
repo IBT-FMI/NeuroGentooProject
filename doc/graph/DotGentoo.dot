@@ -1,0 +1,35 @@
+graph{
+	//splines=ortho; //Does not work with (compass-) ports
+	
+	node[shape="folder"];
+	dotgentoo[label=".gentoo"];
+	package_mask[label="package.mask"];
+	package_unmask[label="package.unmask"];
+	package_use[label="package.use"];
+	package_keywords[label="package.keywords"];
+	category;
+	overlays;
+	pkg;
+	node[shape="note",label=""]
+	file1;
+	file2;
+	file3;
+	file4;
+	file5;
+	file6;
+	ebuild[label="pkg-99999.ebuild"];
+	dotgentoo -- overlays:n;
+	overlays -- file5:n;
+	overlays -- file6:n;
+	dotgentoo -- package_mask:n;
+	dotgentoo -- package_keywords:n;
+	dotgentoo -- package_use:n;
+	dotgentoo -- package_unmask:n;
+	package_unmask -- file1;
+	package_use -- file2;
+	package_mask -- file3;
+	package_keywords -- file4;
+	dotgentoo -- category:n;
+	category -- pkg -- ebuild;
+	
+}
