@@ -1,0 +1,22 @@
+digraph{
+	rankdir=LR;
+	newrank=true;
+	User;
+	node[shape="folder"]
+	subgraph cluster0{
+		label="$PWD/roots/<ID>/";
+		Pre[label="hooks/<command>/pre/"];
+		Post[label="hooks/<command>/post/"];
+		Chain[shape="note", label="hooks/<command>/chain"];
+	}
+	subgraph cluster1{
+		label="BuildServer";
+		Exec[shape="note",label="exec.sh"];
+		Main[label="scripts/<type>/<command>/"];
+	}
+	User -> Exec [label="<command>"];
+	Exec -> Pre -> Main -> Post -> Chain;
+	newrank=false;
+	Chain -> Exec [label="<command_2>"];
+	Chain -> Exec [label="<command_3>"];
+}
