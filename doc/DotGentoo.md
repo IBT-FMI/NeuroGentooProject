@@ -10,10 +10,10 @@ Usually, ebuilds are distributed within a central overlay.
 While this approach is usually reasonable, since it enforces some structure on the distribution of ebuilds, there are some edge-cases where it does not fit well.
 Namely, if we want to distribute a single piece of development software with build-instructions, but without the overhead of adding it to a larger overlay and distributing it.
 
-Additionally, if we just distribute the ebuild with our software sources, we may:
+Additionally, if we just distribute the ebuild with our software sources, we may want to:
 
-* want to specify additional overlays for dependencies in our ebuild (for example the science overlay for scientific software)
-* want to install not only the live-sources, but the dirty software directory with our not-commited changes
+* specify additional overlays for dependencies in our ebuild (for example the science overlay for scientific software)
+* install not only the live-sources, but the dirty software directory with our not-commited changes
 
 Layout
 ------

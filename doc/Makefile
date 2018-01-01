@@ -2,7 +2,7 @@
 
 all: Dokumentation.html
 
-Dokumentation.md: DotGentoo.md BuildServer.md BLAS_Lapack.md
+Dokumentation.md: DotGentoo.md BLAS_Lapack.md BuildServer.md UseCases.md
 	( for file in $^; do cat $$file; echo; done) > $@
 
 %.html:%.md $(wildcard %.html.pre %.html.post)
@@ -11,10 +11,10 @@ Dokumentation.md: DotGentoo.md BuildServer.md BLAS_Lapack.md
 	cmark -t html $< | sed 's/\.png/\.svg/g' >> $@
 	if [[ -f $@.post ]]; then cat $@.post >> $@; fi
 
-%.tex:%.md $(wildcard %.html.pre %.html.post)
+%.tex:%.md $(wildcard %.tex.pre %.tex.post)
 	echo > $@
 	if [[ -f $@.pre ]]; then cat $@.pre > $@; fi
-	cmark -t tex $< | sed 's/\.png/\.svg/g' >> $@
+	cmark -t latex $< | sed 's/\.png/\.pdf/g' >> $@
 	if [[ -f $@.post ]]; then cat $@.post >> $@; fi
 
 %.ms:%.md

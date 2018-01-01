@@ -1,5 +1,8 @@
-Docker Images
+Case Examples
 =============
+
+Setting up a Docker Image Build Server
+--------------------------------------
 
 Setting up Docker images for TravisCI testing.
 
@@ -7,8 +10,7 @@ Prerequisites: You need a repository with a .gentoo folder, and we assume
 it is placed in the root of the repository.
 
 
-DockerHub
----------
+### DockerHub
 
 First of all, we need to provide a repository for the Docker image.
 This is usually DockerHub, but can be adapted to any other storage method.
@@ -17,8 +19,7 @@ To do this, you need a DockerHub account, and create a repository there.
 It will be named with the scheme youruser/reponame 
 
 
-TravisCI
---------
+### TravisCI
 
 On the Travis side, we need to set-up the .travis.yml in the right way.
 
@@ -35,8 +36,7 @@ script:
   - docker exec repositorg sh -c 'FEATURES="test" /home/repositorg/.gentoo/install.sh'
 ```
 
-BuildServer
------------
+### BuildServer
 
 We need to instantiate the BuildServer image first:
 

@@ -2,7 +2,7 @@ Build Server
 ============
 
 Here we describe a build server infrastructure for gentoo images.
-The BukldServer is a collection of shell-scripts that automate the creation, 
+The BuildServer is a collection of shell-scripts that automate the creation, 
 maintenance and formatchanges of a Gentoo System.
 
 The BuildServer always does it's work relative to the current working directory of the parent process.
@@ -32,7 +32,9 @@ To update the stemgentoo, use the command `exec.sh stemgentoo update`
 Machine Types
 -------------
 
-There are two machine types:
+
+The machine-type decides which set of scripts get executed.
+Currently, there are two machine types defined:
 * stemgentoo
 * default
 
@@ -61,8 +63,18 @@ Error handling is provided with the shell.
 We track whether a command fails with `trap <func> ERR`.
 This means that as soon as any command ends with a non-zero exit status, we jump to `<func>`
 
-Inside this functions we do certain cleanup tasks and exit with a non-zero status afterwords.
-The cleanup-tasks get defined by the script. 
+We can add cleanup-tasks to this error-handler with the shell-function
+`on_error "<str>"`.
+This function adds the string `<str>` to a stack.
+In the case of an error these strings get popped from the stack and evaluated.
+
+Cleanup
+-------
+
+Cleanup works exactly the same as error-handling, but it gets executed always before exiting the shell, 
+and functions are added with `on_exit "<str>"`
+
+In case of an error, first the cleanup-stack and then the error-stack get processed.
 
 Configuration
 -------------
@@ -105,12 +117,11 @@ If you wish to execute a command after another command has finished, you can spe
 which is a file containing all the commands that should be executed after `command`.
 Every command should stand in its own line (`\n`-separated)
 
-
 Logging
 -------
 
 Logging is done in the directory specified in the config files
 By default, this has the form `roots/<ID>/logs/<command>/`
 
-Every script of that command that gets executed writes to a new log-file
-called `<script>.log` (for example `00-setup.sh.log`)
+Every script that is executed generates its own log-file, into which the script stdout and stderr are piped.
+For example, if a command contains a script called `00-setup.sh`, its output will be written to the file `00-setup.sh.log`.
