@@ -5,7 +5,10 @@
 		<title>Documentation</title>
 		<meta charset="UTF-8"/>
 		<style type="text/CSS">
-			body > *{
+			body{
+				font-family:STIX,serif;
+			}
+			#content > *{
 				margin-left:2ex;
 			}
 			h1,h2,h3,h4,h5{
@@ -16,36 +19,57 @@
 			*:target{
 				color:darkred;
 			}
+			pre{
+				white-space: pre-wrap;
+			}
 			img{
 				max-width:100%;
 			}
 			p.img{
 				text-align:center;
 			}
-			body > div{
+			#grid{
 				display: grid;
-				grid-template-columns:30ex 1fr;
-				grid-gap:10px;
-				grid-auto-rows:minmax(100px,auto);
 			}
-			#navbar{
-				grid-column:1/2;
-				grid-row:1;
+			@media only screen and (min-width: 102ex){
+				#grid{
+					grid-template-columns:30ex minmax(70ex,120ex);
+					grid-gap:2ex;
+					grid-auto-rows:minmax(100px,auto);
+				}
+				#navbar{
+					grid-column:1/2;
+					grid-row:1/1;
+				}
+				#content{
+					grid-column:2/2;
+					grid-row:1/1;
+				}
+			}
+			@media only screen and (max-width: 102ex){
+				#grid{
+					grid-auto-rows:minmax(100px,auto);
+				}
+				#navbar{
+					grid-column:1/1;
+					grid-row:1/2;
+				}
+				#content{
+					grid-column:1/1;
+					grid-row:2/2;
+				}
 			}
 			#navbar ul{
 				padding-left:2ex;
+				list-style-type:none;
 			}
 			#navbar > ul{
 				padding-left:0px;
 			}
-			#content{
-				grid-column:2/2;
-				grid-row:1;
-			}
 		</style>
 	</head>
 	<body>
-	<div>
+	<div id="grid">
 	<div id="navbar">
 	</div>
 	<div id="content">

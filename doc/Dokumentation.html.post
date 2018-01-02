@@ -24,11 +24,12 @@
 			li.appendChild(a);
 			return li;
 		}
-		function idIze(node){
-			node.setAttribute("id",hToHref(node.innerText));
+		function idIze(node,href){
+			node.setAttribute("id",href);
 		}
 		function getHeaders(item,node,level){
 			var level=0;
+			var cnt=0;
 			var uls=new Array();
 			var node=node.firstChild;
 			while(node){
@@ -49,11 +50,11 @@
 						}
 					}
 					level=nextLevel;
-					idIze(node);
 					var ul=uls[uls.length-1];
 					var name=node.innerText;
-					var href="#"+hToHref(name);
-					ul.appendChild(getLi(name,href));
+					var href=hToHref(name)+"_"+(cnt++);
+					idIze(node,href);
+					ul.appendChild(getLi(name,"#"+href));
 				}
 				node=node.nextSibling;
 			}
