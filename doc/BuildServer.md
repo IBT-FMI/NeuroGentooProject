@@ -1,12 +1,14 @@
 Build Server
 ============
 
-Here we describe a build server infrastructure for gentoo images.
-The BuildServer is a collection of shell-scripts that automate the creation, 
-maintenance and formatchanges of a Gentoo System.
+The BuildServer is a infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes of these systems.
 
-The BuildServer always does it's work relative to the current working directory of the parent process.
-If you want to have the images in a specific directory, you should `cd` into them.
+![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
+
+Its user-interface resides in the script `exec.sh`, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [machinetype]`
+
+The work is always done relative to the current working directory.
+If you want to have the images in a specific directory, you have to `cd` into them.
 
 Each Gentoo-System is stored in a directory `$PWD/roots/<ID>/root/`.
 `<ID>` is one of:
@@ -18,60 +20,92 @@ Prerequisites
 
 * Bash version >=4.2
 * [dracut](https://dracut.wiki.kernel.org/index.php/Main_Page) for openstack images
+* [syslinux](http://www.syslinux.org/) for openstack images
 * Portage
 * Python
+
+Why Bash?
+---------
+
+Bash has some properties that make it useful for the context of building images:
+
+* It is easy to create processes and redirect their input/output streams to different sources/sinks. This is especially useful since image-building is a very process-heavy (i.e. most of the tasks are solely: execute program A, then program B, etc.).
+* Many people can write shell-scripts at least to a certain degree.
+* There are error-handling primitives in place to stop the execution of the scripts when any subprogram fails.
+
+Roots Directory
+---------------
+
+The `$PWD/roots` directory containts all the images tracked by the buildserver.
+It has the following contents:
+
+* `root/`: The actual image-files
+* `hooks/`: Hooks for adding image-specific steps to the build process
+* `config/`: Configuration to alter the behaviour of the BuildServer for a specific image
+* `logs/`: The standard output and standard error of the command-steps
+* `openstack_images`: The generated openstack images
+* `registry`: Usually used for preserving some state for the images, for example the latest docker image corresponding to this image. 
 
 Initialization
 --------------
 
-To initialize a BuildServer, you need to run `./exec.sh stemgentoo initialize`.
-This command builds the `stemgentoo` and sets up all the necessary variables.
+The call `./exec.sh stemgentoo initialize` initializes the BuildServer.
+This command builds the `stemgentoo` based on the most recent stage3 provided by <https://gentoo.org> and sets up all the necessary prerequisites (for example a cache for commonly used files).
 
-To update the stemgentoo, use the command `exec.sh stemgentoo update`
+To update the stemgentoo, use the command `exec.sh stemgentoo update`, or do it automatically with a cronjob.
 
 Machine Types
 -------------
-
 
 The machine-type decides which set of scripts get executed.
 Currently, there are two machine types defined:
 * stemgentoo
 * default
 
-The latter get based off the stemgentoo when initializing them.
+The default machines get based off the stemgentoo when initializing them, and stemgentoos get based off the most current amd64 stage3 tarball provided on <https://gentoo.org>
 
 Commands
 --------
 
-Commands are defined in `scripts/`. If we want to execute `command` for
-a machine of type `machinetype`,
-all scripts in `scripts/command/machinetype/` are executed in lexical order.
+The commands are defined in the `scripts/` directory. To execute `command` for
+a machine of type `machinetype` `exec.sh </path/to/.gentoo> <command> <machinetype>` is invoked.
+This results in all scripts in `scripts/command/machinetype/` being executed in lexical order.
 
 Scripts
 -------
 
-Scripts are executable files stored in `scripts/command/machinetype/`.
-If their name ends in `.chroot`, the BuildServer will chroot to the specific root
+Scripts are executable bash scripts stored in `scripts/command/machinetype/`.
+If their name ends in `.chroot`, the BuildServer will chroot to the corresponding image
 before executing the commands.
-If it is a directory (or even a symlink to a directory), all executable files contained
+If it is a directory (or a symlink to a directory), all executable files contained
 therein will be executed.
+
+### Variables
+
+The scripts have access to certain environment and global variables:
+
+* `STAGE`: The current command executed, e.g. `update`
+* `MACHINE`: The image ID currently worked on
+* `MACHINETYPE`: The machine type of the current image, e.g. `stemgentoo`
+* `ROOT`: The absolute directory to the image root
+* Anything exported (or for non-chrooted scripts globally defined) variables in the configuration files.
+* Global or exported variables from previously executed scripts.
+
+Note that chrooted scripts loose all global variables and can only access exported ones.
 
 Error Handling
 --------------
 
-Error handling is provided with the shell.
-We track whether a command fails with `trap <func> ERR`.
-This means that as soon as any command ends with a non-zero exit status, we jump to `<func>`
+Error handling is provided within the shell.
+Command failures are tracked with `trap <func> ERR`, meaning that as soon as any command ends with a non-zero exit status, the shell jumps to the function `<func>`
 
-We can add cleanup-tasks to this error-handler with the shell-function
-`on_error "<str>"`.
-This function adds the string `<str>` to a stack.
-In the case of an error these strings get popped from the stack and evaluated.
+Cleanup tasks can be added to this error-handler with the shell-function `on_error "<str>"`.
+This function adds the string `<str>` to a stack, and in case of an error they get popped from the stack and evaluated in reverse order, i.e. the command that was added to the stack the latest gets executed first.
 
 Cleanup
 -------
 
-Cleanup works exactly the same as error-handling, but it gets executed always before exiting the shell, 
+Cleanup works exactly the same as error-handling, but it gets executed always before exiting the shell,
 and functions are added with `on_exit "<str>"`
 
 In case of an error, first the cleanup-stack and then the error-stack get processed.
@@ -85,11 +119,10 @@ The following directories are searched for `.conf` files.
 * `config/` in the build-server root
 * `roots/<ID>/config/`
 
-### Chroot-configuration
+### Configuration inside Chroot Scripts
 
-
-If you want to use these configuration parameters inside a chrootet script, 
-make sure to export them into the environment variables first!
+If you want to use these configuration parameters inside a chrooted script, 
+make sure to export them into the environment variables first, since chrooting opens a new shell and therefore loses all local variables.
 
 Hooks
 -----
@@ -101,7 +134,7 @@ There are two types of hooks:
 * pre and post command hooks: these are additional scripts executed in a command
 * command chains: these allow executing another command after one has finished 
 
-![Hooks and Command-Chains](graph/Scripts.png)
+![A flowchart of all configuration files, hooks and command chains](graph/Scripts.png)
 
 ### Pre and Post Hooks
 
@@ -111,7 +144,7 @@ and `post`.
 Everything in `pre` gets executed before the scripts in `hooks/<command>/<machinetype>`, 
 everything in `post` afterwords.
 
-### Command-Chaining
+### Command Chaining
 
 If you wish to execute a command after another command has finished, you can specify that via `roots/<ID>/hooks/<command>/chain`
 which is a file containing all the commands that should be executed after `command`.
@@ -123,5 +156,45 @@ Logging
 Logging is done in the directory specified in the config files
 By default, this has the form `roots/<ID>/logs/<command>/`
 
-Every script that is executed generates its own log-file, into which the script stdout and stderr are piped.
-For example, if a command contains a script called `00-setup.sh`, its output will be written to the file `00-setup.sh.log`.
+Every script that is executed generates its own log-file, into which its stdout and stderr are piped.
+For example, if a command contains a script called `00-setup.sh`, its output will be written to the file `roots/<ID>/logs/<command>/00-setup.sh.log`.
+
+Periodic Updates
+----------------
+
+A periodic update is a periodic call to `exec.sh /path/to/.gentoo update` for every .gentoo inside the `roots/` folder.
+This can be and is usually done with a cron-job, i.e. a short shell-script that gets executed periodically.
+A reference implementation is provided in the BuildServer under `example_scripts/cronjob.sh`
+
+Limitations
+--------
+
+### Security
+
+The BuildServer has no built-in security considerations.
+Therefore, one should *not* run it on any untrusted .gentoo directories.
+A possible attack vector is a malicious ebuild inside the .gentoo that could for example write to `/dev/sda`, resulting in the changes propagating to the host system. Hence, not only the image but also the host system is compromised.
+
+### Cross Architecture Build
+
+Cross-building for another architecture is not supported, since some scripts are chrooted to the image root.
+If the bash-executable of this image is in a binary format that the host machine can not execute, this chrooting will fail.
+
+Further Work
+------------
+
+While the BuildServer is designed to be as flexible as possible to adapt to non-anticipated scenarios, there are some possibilities for extending the work:
+
+### Web-Interface
+
+Write a Web-interface to make adding new .gentoo directories easier.
+This might be as simple as a file-upload for an ebuild and adding additional meta-information and hooks.
+
+### Security Improvements
+
+Provide the BuildServer as a service for untrusted users, i.e. make it secure such that users can not break out of the context of their images.
+
+### Efficiency improvement
+
+Try to reduce the calculation overhead. Many programs will be compiled multiple times with identical parameters (USE flags, dependencies, etc), even across images.
+This overhead could be reduced, e.g. by using ccache (avoids recompiling individual .c-files) or some work on Portage binary packages (saves all files generated by an individual package inside a compressed archive)

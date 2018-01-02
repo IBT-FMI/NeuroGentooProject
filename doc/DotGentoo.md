@@ -1,25 +1,26 @@
 .gentoo
 =======
 
-The .gentoo-folder is a new approach of bundling a Gentoo ebuild (see the Package Manager Specification [PMS]) with your software.
+The .gentoo-folder is a new approach of bundling a Gentoo Ebuild (see the Package Manager Specification [PMS]) with your software.
 
 Motivation
 ----------
 
 Usually, ebuilds are distributed within a central overlay.
-While this approach is usually reasonable, since it enforces some structure on the distribution of ebuilds, there are some edge-cases where it does not fit well.
-Namely, if we want to distribute a single piece of development software with build-instructions, but without the overhead of adding it to a larger overlay and distributing it.
+While this approach is reasonable for most cases since it enforces some structure on the distribution of ebuilds (usually combined with quality control), there are some edge-cases where it does not fit well.
+Namely, if we want to distribute a single piece of development software and bundle the Ebuild within, but do not want the overhead of adding a whole overlay into our system.
+A more convenient approach just distributed an ebuild and some way to install it with a single command, base it off the current working directory.
 
 Additionally, if we just distribute the ebuild with our software sources, we may want to:
 
-* specify additional overlays for dependencies in our ebuild (for example the science overlay for scientific software)
-* install not only the live-sources, but the dirty software directory with our not-commited changes
+* specify additional overlays for dependencies in our ebuild, that are not included in the main portage tree (for example the science overlay for scientific software like FSL or AFNI)
+* specify package masks, keywords, USE flags and unmasks required for the ebuild
 
 Layout
 ------
 
-It is a simple directory containing:
-* A 99999-ebuild in a valid portage tree structure, i.e. `.gentoo/category-name/pkgname/pkgname-99999.ebuild`
+The .gentoo format is a simple directory containing:
+* A 99999-ebuild in a valid portage tree structure as defined in the Package Manager Standard, i.e. `.gentoo/category-name/pkgname/pkgname-99999.ebuild`
 * `package.mask/` `package.keywords/` `package.use/` and `package.unmask/`
 * `overlays/`, which contains additionally required overlays in the same format as `/etc/portage/repos.conf/`
 
@@ -58,5 +59,17 @@ Hence, it is generated as the sha512-sum of the following UTF8 bytestream:
 	
 	Normalized means the comments are removed and the entries are listed
 	in lexical order.
+
+This yields a reasonably robust ID to any change outside the ebuilds.
+But a slight change to the ebuild will affect the ID.
+
+The install.sh Script
+---------------------
+
+In the template .gentoo there is a install.sh script included.
+This script works in conjunction with the ebuild by passing an environment variable that contains the directory of the project root, allowing the ebuild to copy over the current directory when installing it.
+Additionally, it sets up a temporary overlay inside the .gentoo, builds the ebuild manifest and executes emerge with the first ebuild it finds inside the .gentoo, and passing its commandline arguments to it.
+
+The script does *not* install any overlay or package mask, use, keyword or unmask file.
 
 [PMS]: https://dev.gentoo.org/~ulm/pms/head/pms.html "Package Manager Specification"

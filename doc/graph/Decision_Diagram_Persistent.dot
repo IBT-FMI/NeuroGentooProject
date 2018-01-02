@@ -1,0 +1,33 @@
+digraph{
+#	splines=ortho;
+	node[shape="diamond"]
+	phys[label="Physical?"];
+	cluster[label="Cluster?"];
+	pc[label="PC?"];
+	
+	
+	node[shape="rectangle"];
+	img[label="Gentoo Image"];
+	prefix[label="Gentoo Prefix"];
+	bare[label="Bare-Metal"];
+	
+	node[shape="ellipse"];
+	d_pc[label="Your PC"];
+	d_euler[label="EULER"];
+	d_ops[label="OpenStack"];
+	d_tower[label="Bartholin"];
+	
+	phys -> cluster[label="n"];
+	phys -> pc[label="y"];
+	pc -> d_tower[label="n"];
+	pc -> d_pc[label="y"];
+	d_pc -> prefix;
+	d_pc -> bare;
+	d_tower -> prefix;
+	
+	cluster -> d_ops[label="n"];
+	cluster -> d_euler[label="y"];
+	
+	d_ops -> img;
+	d_euler -> prefix;
+}

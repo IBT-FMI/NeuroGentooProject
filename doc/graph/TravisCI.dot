@@ -1,0 +1,12 @@
+digraph{
+	rankdir=LR;
+	User;
+	GitHub;
+	TravisCI;
+	DockerHub;
+	User -> GitHub[label="git push"];
+	GitHub -> TravisCI;
+	TravisCI -> DockerHub[label="docker pull"];
+	DockerHub -> TravisCI[label="\n"];
+	TravisCI -> User[label="build passed/failed"];
+}

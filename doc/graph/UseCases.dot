@@ -1,0 +1,27 @@
+graph{
+	Root[label="",shape="point"];
+	SPP[label="Single-Purpose"]
+	{rank=same
+		node[shape="rectangle"]
+		VMI[label="Virtual Image"];
+		Prefix[label="Gentoo Prefix"];
+		Bare[label="Bare Metal"];
+	}
+	{rank=same
+		node[shape="diamond"];
+		Docker;
+		OpenStack;
+		Cluster;
+		Towers;
+		PC;
+	}
+	
+	Root -- {Persistent, SPP};
+	SPP -- Docker;
+	Persistent -- {Virtual, Physical};
+	Virtual -- {OpenStack,Cluster};
+	Physical -- {PC, Towers};
+	{Docker, OpenStack} -- VMI;
+	{Cluster, Towers} -- Prefix;
+	PC -- {Bare,Prefix};
+}

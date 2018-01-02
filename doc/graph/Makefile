@@ -1,5 +1,7 @@
 DOTFILES=$(wildcard *.dot)
-DOTOPTS=-Gbgcolor="\#ffffff00"
+FONT="STIX"
+FONTSIZE="11.0"
+DOTOPTS=-Gbgcolor="\#ffffff00" $(addsuffix fontname=$(FONT),-G -N -E) $(addsuffix fontsize=$(FONTSIZE),-G -N -E)
 
 all: $(patsubst %.dot, %.png, $(DOTFILES)) $(patsubst %.dot, %.svg, $(DOTFILES))$(patsubst %.dot, %.pdf, $(DOTFILES))
 

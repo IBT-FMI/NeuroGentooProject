@@ -13,9 +13,39 @@
 				margin-top:2ex;
 				margin-bottom:0ex;
 			}
+			*:target{
+				color:darkred;
+			}
 			img{
 				max-width:100%;
+			}
+			p.img{
+				text-align:center;
+			}
+			body > div{
+				display: grid;
+				grid-template-columns:30ex 1fr;
+				grid-gap:10px;
+				grid-auto-rows:minmax(100px,auto);
+			}
+			#navbar{
+				grid-column:1/2;
+				grid-row:1;
+			}
+			#navbar ul{
+				padding-left:2ex;
+			}
+			#navbar > ul{
+				padding-left:0px;
+			}
+			#content{
+				grid-column:2/2;
+				grid-row:1;
 			}
 		</style>
 	</head>
 	<body>
+	<div>
+	<div id="navbar">
+	</div>
+	<div id="content">

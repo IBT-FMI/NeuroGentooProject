@@ -1,60 +1,80 @@
-Case Examples
-=============
+Use Cases
+=========
 
-Setting up a Docker Image Build Server
---------------------------------------
+A way to distribute build instructions alongside the software was discussed in the previous section, but it relies on an existing Gentoo Linux installation.
 
-Setting up Docker images for TravisCI testing.
+To make Gentoo available on many machine types, three installation methods are explored:
 
-Prerequisites: You need a repository with a .gentoo folder, and we assume
-it is placed in the root of the repository.
+* Bare-Metal: A classical installation on a hard-disk partition
+* [Gentoo Prefix](https://wiki.gentoo.org/wiki/Project:Prefix): An installation inside the home-directory of a different UNIX system.
+* Virtual Machine Images.
 
+![A tree of the different machine categories (ellipses), machine types (rectangles) and Gentoo installation methods (diamonds)](graph/UseCases.png)
 
-### DockerHub
+Bare-Metal Installations
+------------------------
 
-First of all, we need to provide a repository for the Docker image.
-This is usually DockerHub, but can be adapted to any other storage method.
+This method only applies for Personal Computers, since they provide the most choice.
 
-To do this, you need a DockerHub account, and create a repository there.
-It will be named with the scheme youruser/reponame 
+It is only necessary to follow the [Gentoo Installation Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page),
+pull the repository and execute the `install.sh` script inside the .gentoo directory, maybe with prior installation of the metadata.
 
+### Installation of the Metadata
 
-### TravisCI
+In the .gentoo-directory, do the following: 
 
-On the Travis side, we need to set-up the .travis.yml in the right way.
+1. Copy the package files:
+	```bash
+	for dir in keywords use mask unmask; do [ -e "package.${dir}" ] && rsync -av "package.${dir}" "/etc/portage/"; done
+	```
+2. Copy the additional overlays:
+	```bash
+	mkdir -p /etc/portage/repos.conf
+	cp -n -t overlays/* /etc/portage/repos.conf
+	```
+3. Sync the additional overlays
+	```bash
+	emaint sync -a
+	```
+Now one can safely execute the `./install.sh` script.
 
-```
-before_install:
-  - docker pull buffepva/repositorg
-  - docker create --name "repositorg" --rm -ti -v "${PWD}":/home/repositorg buffepva/repositorg
-  - docker start repositorg
-  - docker exec repositorg emaint sync -a
-  - docker exec repositorg /home/repositorg/.gentoo/install.sh -o
-install:
-  - docker exec repositorg sh -c 'FEATURES="-test" /home/repositorg/.gentoo/install.sh'
-script:
-  - docker exec repositorg sh -c 'FEATURES="test" /home/repositorg/.gentoo/install.sh'
-```
+Gentoo Prefix Installations
+---------------------------
 
-### BuildServer
+Prefix installations are full Gentoo Linux installations, that reside somewhere in the users home-directory, and do not affect the host system.
+It can be understood as a kind of virtual machine *without* the strict encapsulation from guest to host, but also without the usual virtualization overhead.
 
-We need to instantiate the BuildServer image first:
+Gentoo Prefix is installed with a script that leads the user through the whole process and requires only minimal interaction at the beginning.
+This script can be downloaded from the Gentoo developer page at <https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh>
 
-* `cd /path/to/build/server`
-* `./exec.sh /path/to/repository/.gentoo/ initialize`
+Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the prefix directory, which is usually `$HOME/gentoo/etc/portage/`
 
-This creates a new root with id `$ID`
+### EULER
 
-Then we need to set-up that after every update the BuildServer must build
-a Docker image and upload it to DockerHub.
+Gentoo Prefix is the only way of using Gentoo Linux on the EULER Cluster, but it has some quirks:
 
-* `mkdir roots/$ID/scripts/docker_image/post/ roots/<ID>/actionchain/post/`
-* `echo docker_image >> roots/$ID/actionchain/post/update`
-* `cp example_hooks/docker_image/post/30-upload_dockerimage.sh roots/$ID/scripts/docker_image/post/`
-* Adapt the necessary variables in `roots/$ID/actionchain/post/30-upload_dockerimage.sh`
+* The number of files in the home-directory is limited to a too small number for Gentoo Prefix. One either has to use `$SCRATCH`, which is slow and sometimes unstable, or ask the technical support for a higher inode quota.
+* The normal Bash environment has a environment variable set that prefix does not like. It has to be unset in `$HOME/.bashrc`:
+	```bash
+	export -n LD_LIBRARY_PATH
+	unset LD_LIBRARY_PATH
+	```
+* The user- and group-id do not exist locally but on a remote server. Prefix has to be told about the non-standard user and group database:
+	```bash
+		for b in 32 64
+		do
+			dir="${EPREFIX}/lib${b}/"
+			mkdir -p "${dir}"
+			ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so*
+		done
+		mkdir "${EPREFIX}/etc"
+		cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
+	```
 
-Now you have to provide the credentials to the local Docker commands with `docker login dockerhub.com`
+A fully integrated way to prepare *and* install Gentoo Prefix on EULER is distributed on the [IBT-FMI GitHub page](https://raw.githubusercontent.com/IBT-FMI/NeuroGentooProject/master/Euler/euler.sh)
 
-To upload this image for the first time now, execute
-* `./exec.sh /path/to/repository/.gentoo update`
-If all goes well, you should have a brand-new image uploaded to your DockerHub
+Virtual Machine Images
+----------------------
+
+Virtual Machine Images usually have to be reasonably recent and ideally would bring the required software with them.
+To achieve these goals a BuildServer infrastructure is presented in the next chapter, that can periodically build ready to use images for Docker and OpenStack Cloud providers based on a specific .gentoo directory.
