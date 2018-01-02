@@ -74,11 +74,11 @@
 		
 		Hence, package managers are employed to do the dependency resolution.
 		One of these managers is Portage, used by Gentoo Linux and derivatives.
-		Its key-feature is that the packages are not based on binary tarballs but on recipes (called Ebuilds) on how to obtain, build and test the software and what dependencies have to be installed prior.
+		Its key-feature are source-based packages, i.e. packages not based on pre-compiled binary tarballs but on recipes (called Ebuilds) on how to obtain, build and test the software, as well as a list of its dependencies.
 		This has advantages over other approaches:
 		\begin{enumerate}
 			\item Ebuilds are easy to write, since they are straight-forward text files written in Bash and nice documentation
-			\item Ebuilds are usually easily updated to a new version
+			\item Ebuilds are usually easily updated to a new version just by increasing the version number in the Ebuild.
 			\item The resulting programs are optimized by the compiler to run as efficiently as possible on the machine they are deployed on\footnote{Binary distributions like Debian Linux have binaries compiled to run reasonably fast on \emph{all} machines, which might not always be the fastest way for your specific machine}
 		\end{enumerate}
 		
