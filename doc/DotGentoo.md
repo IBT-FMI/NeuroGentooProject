@@ -1,17 +1,17 @@
 .gentoo
 =======
 
-The .gentoo-folder is a new approach of bundling a Gentoo Ebuild (see the Package Manager Specification [PMS]) with your software.
+The .gentoo-folder is a new approach of bundling a Gentoo Ebuild (see the Package Manager Specification [PMS]) together with the software.
 
 Motivation
 ----------
 
 Usually, Ebuilds are distributed within a central overlay.
 While this approach is reasonable for most cases since it enforces some structure on the distribution of Ebuilds (usually combined with quality control), there are some edge-cases where it does not fit well.
-Namely, if we want to distribute a single piece of development software and bundle the Ebuild within, but do not want the overhead of adding a whole overlay into our system.
-A more convenient approach just distributed an Ebuild and some way to install it with a single command, base it off the current working directory.
+Namely, if we want to distribute a single piece of development software and bundle the Ebuild inside the repository without the overhead of adding a whole overlay into the Gentoo system.
+The more convenient approach distributes an Ebuild and provides a way to install it with a single command, based on the current (maybe dirty, i.e. including non-commited changes) state of the projects working directory.
 
-Additionally, if we just distribute the Ebuild with our software sources, we may want to:
+Additionally, to be able to distribute the Ebuild with our software sources, it is important to:
 
 * specify additional overlays for dependencies in our Ebuild, that are not included in the main portage tree (for example the science overlay for scientific software like FSL or AFNI)
 * specify package masks, keywords, USE flags and unmasks required for the Ebuild
@@ -68,7 +68,7 @@ The install.sh Script
 
 In the template .gentoo there is a install.sh script included.
 This script works in conjunction with the Ebuild by passing an environment variable that contains the directory of the project root, allowing the Ebuild to copy over the current directory when installing it.
-Additionally, it sets up a temporary overlay inside the .gentoo, builds the Ebuild manifest and executes emerge with the first Ebuild it finds inside the .gentoo, and passing its command line arguments to it.
+Additionally, it sets up a temporary overlay inside the .gentoo, builds the Ebuild manifest and executes emerge with the first Ebuild it finds inside the .gentoo, and passes its command line arguments to it.
 
 The script does *not* install any overlay or package mask, use, keyword or unmask file.
 
