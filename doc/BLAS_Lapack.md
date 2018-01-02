@@ -1,15 +1,15 @@
 BLAS and Lapack Eclasses
 ========================
 
-Eclasses are ways for reducing code-duplication inside ebuilds.
-They can be understood as libraries for ebuild-writing, providing methods common to many ebuilds.
+Eclasses are ways for reducing code-duplication inside Ebuilds.
+They can be understood as libraries for Ebuild-writing, providing methods common to many Ebuilds.
 
 The line
 ```
 inherit <eclass>
 ```
 
-Loads all definitions and functions from `<eclass>.eclass`, such that they can be used inside the ebuild.
+Loads all definitions and functions from `<eclass>.eclass`, such that they can be used inside the Ebuild.
 
 Motivation
 ----------
@@ -31,7 +31,7 @@ These eclasses define:
   which provide a way for the end-user to select against which version of
   BLAS or Lapack will be linked.
 
-Every package ebuild linking against either BLAS or Lapack can set a 
+Every package Ebuild linking against either BLAS or Lapack can set a 
 variable `BLAS_COMPAT` or `LAPACK_COMPAT` to specify against which 
 libraries the package can be linked (i.e. the compatibility with the
 implementations) by adding their unique name the space-separated list, or
@@ -54,7 +54,7 @@ This variable will then in turn be exported globally.
 In the overlay directory the package-config file of the user-selected
 implementation will be linked to the generic name, i.e. `blas.pc` or
 `lapack.pc`.
-Hence, whenever `pkg-config` gets called to resolve blas or lapack during
+Hence, whenever `pkg-config` gets called to resolve BLAS or Lapack during
 build, the correct library and include paths will be used.
 
 ### C Headers
@@ -96,7 +96,7 @@ Limitations
 Limitations of the approach do exist:
 
 - Packages are not guaranteed to use the same BLAS or Lapack implementation
-  that they were linked against at runtime, since we do not enforce a
+  that they were linked against at run time, since we do not enforce a
   consistent implementation in all dependencies.
   Consider the figure below. The package P1 is dynamically linked against both BLAS B1 and B2.
   When we start the binary of P1, B1 will overwrite B2 or vice versa.
@@ -106,6 +106,6 @@ Limitations of the approach do exist:
 Backwards Compatibility
 -----------------------
 
-All ebuilds depending on BLAS or Lapack have to be adapted manually,
+All Ebuilds depending on BLAS or Lapack have to be adapted manually,
 and implementation providers have to be rebuilt such that the proper
 package-config files are installed

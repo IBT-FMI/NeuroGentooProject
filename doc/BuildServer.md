@@ -173,7 +173,7 @@ Limitations
 
 The BuildServer has no built-in security considerations.
 Therefore, one should *not* run it on any untrusted .gentoo directories.
-A possible attack vector is a malicious ebuild inside the .gentoo that could for example write to `/dev/sda`, resulting in the changes propagating to the host system. Hence, not only the image but also the host system is compromised.
+A possible attack vector is a malicious Ebuild inside the .gentoo that could for example write to `/dev/sda`, resulting in the changes propagating to the host system. Hence, not only the image but also the host system is compromised.
 
 ### Cross Architecture Build
 
@@ -188,7 +188,7 @@ While the BuildServer is designed to be as flexible as possible to adapt to non-
 ### Web-Interface
 
 Write a Web-interface to make adding new .gentoo directories easier.
-This might be as simple as a file-upload for an ebuild and adding additional meta-information and hooks.
+This might be as simple as a file-upload for an Ebuild and adding additional meta-information and hooks.
 
 ### Security Improvements
 
