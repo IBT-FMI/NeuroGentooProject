@@ -69,6 +69,8 @@ This is a design choice as much as it is a design limitation, since the flexibil
 The install.sh Script
 ---------------------
 
+!!! I understand that there is good reason for not shipping the install.sh script with the .gentoo standard information (simply because the install.sh is a standard utility and not part of the varibale space covered by the standard) but it seems to me that we curretnly lack a seamless avenue for distribution of this file (i.e. the Buildserver assumes it can find it in the .gentoo directory). So maybe this script needs to be included in the layout overview as well.
+
 The .gentoo directory includes an install.sh script.
 This script works in conjunction with the Ebuild by passing an environment variable that contains the directory of the project root, allowing the Ebuild to copy over the current directory when installing it.
 !!! This needs to be explained better
