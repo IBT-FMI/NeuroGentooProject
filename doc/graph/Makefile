@@ -8,6 +8,8 @@ all: $(patsubst %.dot, %.png, $(DOTFILES)) $(patsubst %.dot, %.svg, $(DOTFILES))
 %.png: %.dot
 	dot $(DOTOPTS) -Tpng $^ > $@
 %.pdf: %.dot
-	dot $(DOTOPTS) -Tpdf $^ > $@
+	dot $(DOTOPTS) -Tpdf $^ > $@.tmp
+	pdfcrop $@.tmp $@
+	rm $@.tmp
 %.svg: %.dot
 	dot $(DOTOPTS) -Tsvg $^ > $@
