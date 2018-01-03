@@ -1,7 +1,9 @@
 Build Server
 ============
 
-![The layout of the BuildServer. The user starts exec.sh with parameters, which first asks an utility function getID (in diamond shape) for the .gentoo-ID corresponding to the folder, executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
+![The layout of the BuildServer. The user runs exec.sh providing up to 3 parameters. The exec.sh script first sources a standardized .gentoo-ID (via the getID utility function) corresponding to the .gentoo-directory selected by the user, and subsequently executes all scripts within the corresponding scripts directory. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
+
+!!! I corrected this here but check again for anthropomorphizing f software (scripts don't ask other scripts) and "folder".
 
 The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes (e.g. to Docker or OpenStack formats) of these systems.
 
@@ -15,7 +17,7 @@ Each Gentoo-System is stored in a directory `$PWD/roots/<ID>/root/`.
 * `stemgentoo`
 * The .gentoo-ID corresponding to the `.gentoo`-directory the image is based off
 
-The stemgentoo is not based on a .gentoo-directory, hence it does not have a regular ID.
+The stemgentoo system variety is not based on a .gentoo-directory, hence it does not have a regular ID.
 
 Prerequisites
 -------------
@@ -26,8 +28,8 @@ Prerequisites
 * Portage
 * Python
 
-Why Bash?
----------
+Choice of Language
+------------------
 
 Bash has some properties that make it useful in the context of building images:
 

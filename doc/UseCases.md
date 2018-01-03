@@ -2,15 +2,15 @@ Use Cases
 =========
 
 The distribution method for build instructions alongside the respective software presented in the previous section relies on an existing Gentoo Linux installation.
-This is insufficient given most scientific use cases, where any one pre-existing distribution (or even administrative privileges) cannot be assumed.
+This is insufficient given most scientific use cases, where any one pre-existing Linux distribution (or even administrative privileges) cannot be assumed.
 
-To make Gentoo available on many machine types, three installation methods are explored:
+To make Gentoo available on as many machine types as possible, three installation methods are explored:
 
 * Bare-Metal: A classical installation on a hard-disk partition
 * [Gentoo Prefix](https://wiki.gentoo.org/wiki/Project:Prefix): An installation inside the home-directory of a different UNIX system.
 * Virtual Machine Images.
 
-![A tree of the different machine categories (ellipses), machine types (rectangles) and Gentoo installation methods (diamonds)](graph/UseCases.png)
+![A tree of the different machine categories (ellipses), machine types (diamonds) and Gentoo installation methods (rectangles)](graph/UseCases.png)
 
 Bare-Metal Installations
 ------------------------
@@ -18,10 +18,11 @@ Bare-Metal Installations
 This method primarily applies to Personal Computers, where freedom of choice can generally be assumed.
 
 A Bare-Metal installation is performed by following the [Gentoo Installation Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page).
-To install a software using the .gentoo standard, the user has to clone the repository and execute the `install.sh` script inside the .gentoo directory, potentially with prior installation of the metadata.
+To install a software package using the .gentoo standard, the user has to clone the repository and execute the `install.sh` script inside the .gentoo directory, potentially with prior installation of the metadata.
 
 ### Installation of the Metadata
 
+!!! Please no second person addressing
 In the .gentoo-directory, do the following: 
 
 1. Copy the package files:
@@ -39,25 +40,25 @@ In the .gentoo-directory, do the following:
 	```
 Now one can safely execute the `./install.sh` script.
 
-The metadata is not installed automatically, since it is a rather large change to the users Gentoo Linux system, which should not be done without user interaction.
+The reason why metadata installation is not handled automatically, is that it represents a significant change to the users Gentoo Linux system, which should not be done without user interaction.
 
 Gentoo Prefix Installations
 ---------------------------
 
-Prefix installations are full Gentoo Linux installations that reside in the users home-directory, and do not affect the host system.
-It can be understood as a kind of virtual machine *without* the strict encapsulation from guest to host, but also without the usual virtualization overhead.
+Prefix installations are full Gentoo Linux installations that reside in a user's home-directory, and do not otherwise affect the host system.
+Gentoo Prefix can be understood as a kind of virtual machine *without* the strict encapsulation from guest to host, but also without the usual virtualization overhead.
 
-Gentoo Prefix is installed with a script that leads the user through the whole process and requires only minimal interaction at the beginning.
+Gentoo Prefix is installed via an automatic script, which requires only minimal interaction at the onset of the installation porcess.
 This script can be downloaded from the Gentoo developer page at <https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh>
 
-Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the prefix directory, which is `$HOME/gentoo/etc/portage/` by default
+Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the Prefix directory, which is `$HOME/gentoo/etc/portage/` by default.
 
 ### EULER
 
-Gentoo Prefix is the only way of using Gentoo Linux on the EULER Cluster.
-Additionally, for the demonstration at hand, some additional peculiarities of the environment had to be addressed:
+Gentoo Prefix is the most appropriate way of using Gentoo Linux on the EULER Cluster.
+Even so, for the demonstration at hand, some additional peculiarities of the EULER environment had to be addressed:
 
-* The number of files in EULER home-directories is limited to a number too small for Gentoo Prefix. One either has to use `$SCRATCH`, which is slow and sometimes unstable, or ask the technical support for a higher inode quota (generally available for purchase).
+* The number of files in EULER home-directories is limited to a number too small for Gentoo Prefix. One has to either install the system under `$SCRATCH`, which is slow and sometimes unstable (thus only suited as a proof-of principle), or ask the technical support for a higher inode quota (generally available for purchase).
 * The normal Bash environment has a environment variable set that is incompatible with Gentoo Prefix. It has to be unset in `$HOME/.bashrc`:
 	```bash
 	export -n LD_LIBRARY_PATH
@@ -75,10 +76,10 @@ Additionally, for the demonstration at hand, some additional peculiarities of th
 	cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
 	```
 
-A fully integrated way to prepare *and* install Gentoo Prefix on EULER is distributed on the [IBT-FMI GitHub page](https://raw.githubusercontent.com/IBT-FMI/NeuroGentooProject/master/Euler/euler.sh)
+A fully integrated way to prepare *and* install Gentoo Prefix on EULER (successfully handling the aforementioned peculiarities) is distributed on the [IBT-FMI GitHub page](https://raw.githubusercontent.com/IBT-FMI/NeuroGentooProject/master/Euler/euler.sh)
 
 Virtual Machine Images
 ----------------------
 
 Virtual Machine Images should be reasonably recent and ideally should provide all of their required software.
-To achieve these goals a BuildServer infrastructure is presented in the next chapter, that can periodically build ready to use images for Docker and OpenStack Cloud providers based on a specific .gentoo directory.
+To achieve these goals a BuildServer infrastructure is presented in the next chapter, that can periodically build ready to use images for Docker and OpenStack Cloud providers based on any one specific .gentoo directory.
