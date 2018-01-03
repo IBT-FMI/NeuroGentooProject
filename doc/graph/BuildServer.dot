@@ -4,7 +4,7 @@ digraph{
 	User;
 	subgraph cluster0{
 		labeljust=l;
-		label="BuildServer"
+		label="BuildServer files"
 		{rank=same
 		exec[shape="note", label="exec.sh"];
 		getID[shape="diamond"];

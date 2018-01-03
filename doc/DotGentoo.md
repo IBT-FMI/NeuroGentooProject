@@ -2,21 +2,23 @@
 =======
 
 The .gentoo-directory is a new approach of distributing a Gentoo Ebuild (see the Package Manager Specification [PMS]) together with the software.
-!!! Bundling is a bad word, and folder is Windows/GUI terminology
 
 Motivation
 ----------
 
 Usually, Ebuilds are distributed in large sets in overlays.
 While this approach is reasonable for most cases, as it enforces some structure on the distribution of Ebuilds (usually combined with quality control), there are some edge-cases where this approach does not fit well.
-Namely, if we want to distribute a single piece of development software and bundle the Ebuild inside the repository without the overhead of adding a whole overlay into the Gentoo system.
-The more convenient approach distributes an Ebuild and provides a way to install it with a single command, based on the current (maybe dirty, i.e. including non-commited changes) state of the projects working directory.
-!!! You should break all of this up in shorter sentences, even knowing what you are talking about, this is still confusing. Also the expression “maybe dirty” is too informal for the context 
+Namely, when distributing the Ebuild alongside the software.
+The usual approach would be to take the Ebuild, set up a directory, copying over the Ebuild into that directory, and integrate that directory into the Gentoo system as an overlay.
 
-Additionally, to be able to distribute the Ebuild alongside the software sources, it is important to:
+The more convenient approach distributes an Ebuild and provides a way to install it with a single command, based on the current (including non-commited changes) state of the projects working directory.
+Since not all information needed to install the software is contained inside the Ebuild, it is necessary to:
 
 * specify additional overlays for dependencies in our Ebuild, that are not included in the main portage tree (for example the science overlay for scientific software like FSL or AFNI)
 * specify package masks, keywords, USE flags and unmasks required for the Ebuild
+
+This metadata, though contained, should not be added automatically to a users Gentoo Linux, since it has a large effect on the rest of the system.
+Hence, it should not be done without the users explicit consent or without user interaction.
 
 Layout
 ------
@@ -26,7 +28,7 @@ The .gentoo format is a simple directory containing:
 * `package.mask/` `package.keywords/` `package.use/` and `package.unmask/`
 * `overlays/`, which contains additionally required overlays in the same format as `/etc/portage/repos.conf/`
 
-![.gentoo folder structure](graph/DotGentoo.png)
+![.gentoo directory structure](graph/DotGentoo.png)
 
 .gentoo ID
 ----------
@@ -70,11 +72,19 @@ The install.sh Script
 ---------------------
 
 The .gentoo directory includes an install.sh script.
-This script works in conjunction with the Ebuild by passing an environment variable that contains the directory of the project root, allowing the Ebuild to copy over the current directory when installing it.
-!!! This needs to be explained better
-Additionally, it sets up a temporary overlay inside the .gentoo directory, builds the Ebuild manifest and executes emerge with the first Ebuild it finds uner .gentoo, and passes its command line arguments to it.
+The Ebuild has to be adapted slightly such that it does not install the software version given by the sources in `SRC_URI`, `EGIT_REPO_URI` or equivalent, but uses the local files.
+To achieve this, the `install.sh` script works in conjunction with the Ebuild.
+In the script, an environment variable (`DOTGENTOO_PACKAGE_ROOT`) is exported, and the ebuild copies whatever is inside the directory inside this variable to its working directory.
+
+```bash
+src_unpack() {
+        cp -r -L "$DOTGENTOO_PACKAGE_ROOT" "$S"
+}
+```
+
+The  install.sh` script additionally sets up a temporary overlay inside the .gentoo directory, builds the Ebuild manifest and executes emerge with the first Ebuild it finds under .gentoo.
+The command line arguments passed to `install.sh` are forwarded to emerge.
 
 The script does *not* install any overlay or package mask, use, keyword or unmask file. The user is required to do that manually.
-!!! How then do the settings specified in these files take effect, and prevent e.g. dependency breakage via system updates?
 
 [PMS]: https://dev.gentoo.org/~ulm/pms/head/pms.html "Package Manager Specification"

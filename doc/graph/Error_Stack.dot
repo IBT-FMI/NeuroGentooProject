@@ -1,0 +1,21 @@
+digraph{
+	
+	rankdir=LR;
+	on_error_1[label="on_error \"rm file\""];
+	on_error_2[label="on_error \"str2\""];
+	on_error_3[label="on_error \"str3\""];
+	error_exit;
+	subgraph cluster0{
+		label="Stack";
+		Stack[shape=record, label="<a>rm file|<b>str2|<c>str3"]
+	}
+	on_error_1 -> Stack:a[label="3"];
+	on_error_2 -> Stack:b[label="2"];
+	on_error_3 -> Stack:c[label="1"];
+	Stack:a -> error_exit[label="1"];
+	Stack:b -> error_exit[label="2"];
+	Stack:c -> error_exit[label="3"];
+	error_exit -> "rm file"[label="1"];
+	error_exit -> "str2"[label="2"];
+	error_exit -> "str3"[label="3"];
+}

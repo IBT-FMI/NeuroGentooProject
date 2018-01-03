@@ -18,7 +18,7 @@ Bare-Metal Installations
 This method primarily applies to Personal Computers, where freedom of choice can generally be assumed.
 
 A Bare-Metal installation is performed by following the [Gentoo Installation Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page).
-To install a software using the .gentoo standard, the user has to clone the repository and execute the `install.sh` script (!!! “inside” or “from inside”) inside the .gentoo directory, potentially with prior installation of the metadata.
+To install a software using the .gentoo standard, the user has to clone the repository and execute the `install.sh` script inside the .gentoo directory, potentially with prior installation of the metadata.
 
 ### Installation of the Metadata
 
@@ -40,7 +40,6 @@ In the .gentoo-directory, do the following:
 Now one can safely execute the `./install.sh` script.
 
 The metadata is not installed automatically, since it is a rather large change to the users Gentoo Linux system, which should not be done without user interaction.
-!!!Makes sense, though still (*ouch*). In any case, this should (also) be mentioned when you first describe how the metadata is handled. This sounds like a significant ease-of-use deficit, and should be justified as early and clearly as possible.  
 
 Gentoo Prefix Installations
 ---------------------------
@@ -64,19 +63,17 @@ Additionally, for the demonstration at hand, some additional peculiarities of th
 	export -n LD_LIBRARY_PATH
 	unset LD_LIBRARY_PATH
 	```
-* The user- and group-id do not exist locally, but only on a remote server. Prefix has to be informed of the non-standard user and group database:
+* The user- and group-id do not exist locally, but only on a remote server. The non-standard user and group database have to be added to the Prefix system:
 	```bash
-		for b in 32 64
-		do
-			dir="${EPREFIX}/lib${b}/"
-			mkdir -p "${dir}"
-			ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so*
-		done
-		mkdir "${EPREFIX}/etc"
-		cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
+	for b in 32 64
+	do
+		dir="${EPREFIX}/lib${b}/"
+		mkdir -p "${dir}"
+		ln -s -t "${dir}" /usr/lib${b}/libnss_sss.so*
+	done
+	mkdir "${EPREFIX}/etc"
+	cp -L /etc/nsswitch.conf "${EPREFIX}/etc/"
 	```
-!!! Please always capitalize Gentoo Prefix / Prefix, to make it clear you are referring to a proper name not just a noun 
-!!! Please try to avoid anthropomorphizing software (you don't *tell* software, software doesn't *want* things, etc.).
 
 A fully integrated way to prepare *and* install Gentoo Prefix on EULER is distributed on the [IBT-FMI GitHub page](https://raw.githubusercontent.com/IBT-FMI/NeuroGentooProject/master/Euler/euler.sh)
 

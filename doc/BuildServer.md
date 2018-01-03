@@ -3,21 +3,19 @@ Build Server
 
 ![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
 
-The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes of these systems.
-!!! what do you mean by format changes?
+The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes (e.g. to Docker or OpenStack formats) of these systems.
 
 The functionality of the BuildServer is accessed via the `exec.sh` script, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [machinetype]`
 
-Files required for the generation or formatting of a new Gentoo Image are always stored relative to the current working directory.
-!!! Where relative to the current wd?
-If you want to have the images in a specific directory, you have to `cd` into them.
-!!! less “you”
+The image roots and metadata for the images are always stored in the folder `roots` relative to the current working directory.
+To store them in a specific directory, a directory change (`cd`) is required prior to running `exec.sh`.
 
 Each Gentoo-System is stored in a directory `$PWD/roots/<ID>/root/`.
 `<ID>` is one of:
 * `stemgentoo`
-* An ID corresponding to the `.gentoo`-directory the image is based off
-!!! PErhaps mention that this is the checksum ID you previously mentioned, also explain what stemgentoo is and why we opt to treat it differently.§
+* The .gentoo-ID corresponding to the `.gentoo`-directory the image is based off
+
+The stemgentoo is not based on a .gentoo-directory, hence it does not have a regular ID.
 
 Prerequisites
 -------------
@@ -34,13 +32,8 @@ Why Bash?
 Bash has some properties that make it useful in the context of building images:
 
 * It allows easy creation of processes and redirection of their input/output streams to different sources/sinks. This is especially useful since image-building is very process-heavy (i.e. most of the tasks are solely: execute program A, then program B, etc.).
-* It is widely understood, so that many people can write shell-scripts at least to a certain degree.
+* It is widely understood; many people can write shell-scripts at least to a certain degree.
 * It provides error-handling primitives which can stop the execution of scripts when any subprogram fails.
-
-!!! When you create an item list, there has to be a significant degree of similarity between the items:
-
-* If the list is about the advantages of Bash all items should be explicitly referring to bash.
-* If one item is capitalized and is a sentence and ends in a period al should.
 
 
 Roots Directory
@@ -84,11 +77,10 @@ Scripts
 
 Scripts are executable bash scripts stored in `scripts/command/machinetype/`.
 If their name ends in `.chroot`, the BuildServer will chroot to the corresponding image
-before executing the commands.
-!!! Otherwise?
-If it is a directory (or a symlink to a directory), all executable files contained
-therein will be executed.
-!!! An executable bash script cannot be a directory, please restructure your if statements
+before executing the commands, otherwise the BuildServer will source them and execute the command in the host machines context
+
+The script directory may also contain other directories (or a symlink to a directory).
+If execution reaches this directory, all executable files contained therein will be executed.
 
 ### Variables
 
@@ -109,18 +101,20 @@ Error Handling
 Error handling is provided within the shell.
 Command failures are tracked with `trap <func> ERR`, meaning that as soon as any command ends with a non-zero exit status, the shell jumps to the function `<func>`
 
-Cleanup tasks can be added to this error-handler with the shell-function `on_error "<str>"`.
-This function adds the string `<str>` to a stack, and in case of an error they get popped from the stack and evaluated in reverse order, i.e. the command that was added to the stack the latest gets executed first.
-!!! this needs a lengthier explanation
+The BuildServer sets up such a function (`error_exit`), that evaluates and executes strings stored inside a stack datastructure.
+If for example a file should be deleted on error, one can add the string `"rm ${FILE}"` to this stack.
+This can be done with a convenience function `on_error "<str>"`, that pushes the string `<str>` to the error-handling stack.
+By using a stack, it is ensured that the last pushed command will be executed first.
+
+![The error handling stack, where the function on_error pushes a new string and error_exit pops and evaluates all the strings.](graph/Error_Stack.png)
 
 Cleanup
 -------
 
 Cleanup works exactly the same as error-handling, but it gets executed always before exiting the shell,
-and functions are added with `on_exit "<str>"`
+and cleanup are added with `on_exit "<str>"` to their own stack.
 
 In case of an error, first the cleanup-stack and then the error-stack get processed.
-!!! this needs a lengthier explanation, e.g. functions are added to what?
 
 Configuration
 -------------
@@ -133,15 +127,10 @@ The following directories are searched for `.conf` files.
 
 ### Configuration inside Chroot Scripts
 
-If you want to use these configuration parameters inside a chrooted script, 
-make sure to export them into the environment variables first, since chrooting opens a new shell and therefore loses all local variables.
-!!! no “you”
+To access configuration variables inside chrooted scripts (i.e. scripts that end in `.chroot`) they should be exported into the environment variables, since chrooting opens a new shell and therefore loses all local variables.
 
 Hooks
 -----
-
-The images allow for configuration inside their directories.
-!!!wasn't configuration the previous point? if you mean something different here, change the wording.
 
 There are two types of hooks:
 
@@ -150,20 +139,18 @@ There are two types of hooks:
 
 ### Pre and Post Hooks
 
-Image building commands is extended by prepending or appending additional scripts placed in the relevant “hooks” directories: `roots/<ID>/hooks/<command>/pre`
+Image building commands can be extended by prepending or appending additional scripts placed in the relevant "hooks" directories: `roots/<ID>/hooks/<command>/pre`
 and `roots/<ID>/hooks/<command>/post`.
 Everything in `pre` gets executed before the scripts in `hooks/<command>/<machinetype>`, 
 everything in `post` afterwords.
 
 ### Command Chaining
 
-To execute a command after another command has finished, one can specify multiple commands in `roots/<ID>/hooks/<command>/chain`
-that then get executed after command`, with a completely new environment (i.e. global variables are lost, and the cleanup-routines have been executed).
+To link commands together (e.g. to execute `openstack_image` after `update`), one can specify multiple follow-up commands in `roots/<ID>/hooks/<command>/chain`
+that then get executed after `command` has finished, with a completely new environment (i.e. global variables are lost, and the cleanup-routines have been executed. This differentiates chaining from pre and post hooks).
 Each chained command has its own line (they are newline-separated)
-!!! This needs to be better explained, I only understood what you meant after looking at the figure.
 
 ![A flowchart of all configuration files, hooks and command chains](graph/Scripts.png)
-!!!Isn't `$PWD/roots/<ID>` also on the buildserver? if you want to make a distinction between the BuildServer system and the eponympus directory, please refer to them with unambiguous formulations.
 
 Logging
 -------
@@ -204,15 +191,17 @@ While the BuildServer is designed to be as flexible as possible to adapt to non-
 
 ### Web-Interface
 
-Write a Web-interface to make adding new .gentoo directories easier.
-!!! Please formulate the description in a more context-aware fashion (this isn't just a presentation where you list possible-to do statements). Writing a web interface would improve outreach/usability/accessibility/etc
-This might be as simple as a file-upload for an Ebuild and adding additional meta-information and hooks.
+Write a Web-interface to make adding new .gentoo directories easier and implementing a multi-user setup, where users can sign up and manage their own images, transforming the BuildServer into a service provider.
+With this improved usability the accessibility for non-developers is enhanced, opening the BuildServer to a broader user base.
 
 ### Security Improvements
 
 Provide the BuildServer as a service for untrusted users, i.e. make it secure such that users can not break out of the context of their images.
+This is a necessary step to operate the BuildServer as a service to multiple users, s.t. a malicious user can not disrupt the service.
 
 ### Efficiency improvement
 
 Try to reduce the calculation overhead. Many programs will be compiled multiple times with identical parameters (USE flags, dependencies, etc), even across images.
 This overhead could be reduced, e.g. by using ccache (avoids recompiling individual .c-files) or some work on Portage binary packages (saves all files generated by an individual package inside a compressed archive)
+
+For operation of the BuildServer at a large scale, reducing unnecessary compile time is crucial to enhance resource-efficiency and thereby reduce operational costs.
