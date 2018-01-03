@@ -14,10 +14,10 @@ To make Gentoo available on many machine types, three installation methods are e
 Bare-Metal Installations
 ------------------------
 
-This method only applies for Personal Computers, since they provide the most choice.
+This method only applies for Personal Computers, since they provide the most freedom of choice.
 
-It is only necessary to follow the [Gentoo Installation Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page),
-pull the repository and execute the `install.sh` script inside the .gentoo directory, maybe with prior installation of the metadata.
+A Bare-Metal installation is performed by following the [Gentoo Installation Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page).
+To install a software using the .gentoo standard, the user has to pull the repository and execute the `install.sh` script inside the .gentoo directory, potentially with prior installation of the metadata.
 
 ### Installation of the Metadata
 
@@ -38,16 +38,18 @@ In the .gentoo-directory, do the following:
 	```
 Now one can safely execute the `./install.sh` script.
 
+The metadata is not installed automatically, since it is a rather large change to the users Gentoo Linux system, which should not be done without user interaction.
+
 Gentoo Prefix Installations
 ---------------------------
 
-Prefix installations are full Gentoo Linux installations, that reside somewhere in the users home-directory, and do not affect the host system.
+Prefix installations are full Gentoo Linux installations that reside somewhere in the users home-directory, and do not affect the host system.
 It can be understood as a kind of virtual machine *without* the strict encapsulation from guest to host, but also without the usual virtualization overhead.
 
 Gentoo Prefix is installed with a script that leads the user through the whole process and requires only minimal interaction at the beginning.
 This script can be downloaded from the Gentoo developer page at <https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh>
 
-Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the prefix directory, which is usually `$HOME/gentoo/etc/portage/`
+Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the prefix directory, which is `$HOME/gentoo/etc/portage/` by default
 
 ### EULER
 
@@ -76,5 +78,5 @@ A fully integrated way to prepare *and* install Gentoo Prefix on EULER is distri
 Virtual Machine Images
 ----------------------
 
-Virtual Machine Images usually have to be reasonably recent and ideally would bring the required software with them.
+Virtual Machine Images should be reasonably recent and ideally should bring all the required software with them.
 To achieve these goals a BuildServer infrastructure is presented in the next chapter, that can periodically build ready to use images for Docker and OpenStack Cloud providers based on a specific .gentoo directory.

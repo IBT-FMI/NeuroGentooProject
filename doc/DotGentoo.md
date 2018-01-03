@@ -61,7 +61,7 @@ Hence, it is generated as the sha512-sum of the following UTF8 byte stream:
 	in lexical order.
 
 This yields a reasonably robust ID to any change outside the Ebuilds.
-But a slight change to the Ebuild will affect the ID.
+But as can be seen a slight (syntactical) change to the Ebuild will affect the ID drastically.
 
 The install.sh Script
 ---------------------
@@ -70,6 +70,6 @@ In the template .gentoo there is a install.sh script included.
 This script works in conjunction with the Ebuild by passing an environment variable that contains the directory of the project root, allowing the Ebuild to copy over the current directory when installing it.
 Additionally, it sets up a temporary overlay inside the .gentoo, builds the Ebuild manifest and executes emerge with the first Ebuild it finds inside the .gentoo, and passes its command line arguments to it.
 
-The script does *not* install any overlay or package mask, use, keyword or unmask file.
+The script does *not* install any overlay or package mask, use, keyword or unmask file. The user is required to do that manually.
 
 [PMS]: https://dev.gentoo.org/~ulm/pms/head/pms.html "Package Manager Specification"

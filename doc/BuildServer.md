@@ -3,8 +3,6 @@ Build Server
 
 The BuildServer is a infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes of these systems.
 
-![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
-
 Its user-interface resides in the script `exec.sh`, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [machinetype]`
 
 The work is always done relative to the current working directory.
@@ -14,6 +12,8 @@ Each Gentoo-System is stored in a directory `$PWD/roots/<ID>/root/`.
 `<ID>` is one of:
 * `stemgentoo`
 * An ID corresponding to the `.gentoo`-directory the image is based off
+
+![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
 
 Prerequisites
 -------------
@@ -36,8 +36,8 @@ Bash has some properties that make it useful for the context of building images:
 Roots Directory
 ---------------
 
-The `$PWD/roots` directory containts all the images tracked by the buildserver.
-It has the following contents:
+The `$PWD/roots` directory contains all the images tracked by the buildserver inside a directory named after their .gentoo ID, i.e. `$PWD/roots/<ID>`.
+These image directories have the following contents:
 
 * `root/`: The actual image-files
 * `hooks/`: Hooks for adding image-specific steps to the build process
@@ -51,8 +51,6 @@ Initialization
 
 The call `./exec.sh stemgentoo initialize` initializes the BuildServer.
 This command builds the `stemgentoo` based on the most recent stage3 provided by <https://gentoo.org> and sets up all the necessary prerequisites (for example a cache for commonly used files).
-
-To update the stemgentoo, use the command `exec.sh stemgentoo update`, or do it automatically with a cronjob.
 
 Machine Types
 -------------
@@ -134,10 +132,7 @@ There are two types of hooks:
 * pre and post command hooks: these are additional scripts executed in a command
 * command chains: these allow executing another command after one has finished 
 
-![A flowchart of all configuration files, hooks and command chains](graph/Scripts.png)
-
 ### Pre and Post Hooks
-
 
 Images can hook into the commands via `roots/<ID>/hooks/<command>/pre`
 and `post`.
@@ -146,15 +141,17 @@ everything in `post` afterwords.
 
 ### Command Chaining
 
-If you wish to execute a command after another command has finished, you can specify that via `roots/<ID>/hooks/<command>/chain`
-which is a file containing all the commands that should be executed after `command`.
-Every command should stand in its own line (`\n`-separated)
+To execute a command after another command has finished, one can specify multiple commands in `roots/<ID>/hooks/<command>/chain`
+that then get executed after command`, with a completely new environment (i.e. global variables are lost, and the cleanup-routines have been executed).
+Each chained command has its own line (they are newline-separated)
+
+![A flowchart of all configuration files, hooks and command chains](graph/Scripts.png)
 
 Logging
 -------
 
-Logging is done in the directory specified in the config files
-By default, this has the form `roots/<ID>/logs/<command>/`
+Logging is done in the directory specified in the config files.
+This is `roots/<ID>/logs/<command>/` by default, but may be changed globally or on a per-image basis.
 
 Every script that is executed generates its own log-file, into which its stdout and stderr are piped.
 For example, if a command contains a script called `00-setup.sh`, its output will be written to the file `roots/<ID>/logs/<command>/00-setup.sh.log`.
@@ -163,22 +160,24 @@ Periodic Updates
 ----------------
 
 A periodic update is a periodic call to `exec.sh /path/to/.gentoo update` for every .gentoo inside the `roots/` folder.
-This can be and is usually done with a cron-job, i.e. a short shell-script that gets executed periodically.
-A reference implementation is provided in the BuildServer under `example_scripts/cronjob.sh`
+This can be and is usually done with a cronjob, a short shell-script that gets executed at certain times by a system daemon.
+A reference implementation of such a script is provided in the BuildServer under `example_scripts/cronjob.sh`
 
 Limitations
 --------
 
 ### Security
 
-The BuildServer has no built-in security considerations.
+The BuildServer has no security considerations.
 Therefore, one should *not* run it on any untrusted .gentoo directories.
-A possible attack vector is a malicious Ebuild inside the .gentoo that could for example write to `/dev/sda`, resulting in the changes propagating to the host system. Hence, not only the image but also the host system is compromised.
+A possible attack vector is a malicious Ebuild inside the .gentoo that could for example write to `/dev/sda`, resulting in the changes propagating to the host system. Hence, not only the image but also the host system can be compromised.
 
 ### Cross Architecture Build
 
 Cross-building for another architecture is not supported, since some scripts are chrooted to the image root.
 If the bash-executable of this image is in a binary format that the host machine can not execute, this chrooting will fail.
+
+This is not a severe limitation, since nearly all recent machines run on the X86_64 architecture ([ScienceCloud](https://s3itwiki.uzh.ch/display/clouddoc/Science+Cloud+Hardware), [Amazone AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#instance-hardware-specs), and [Travis CI](https://docs.travis-ci.com/user/reference/precise/) all run on X86_64).
 
 Further Work
 ------------

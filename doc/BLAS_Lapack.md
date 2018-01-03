@@ -19,6 +19,8 @@ and Lapack implementation, the reference implementations from netlib.
 This is insufficient for high-performance use, since a well-tuned BLAS or
 Lapack implementation is important to optimally use cluster-resources.
 
+Current non-mainline methods as provided by the [Gentoo science project](https://wiki.gentoo.org/wiki/User_talk:Houseofsuns) require user interaction which can not easily be automated with the BuildServer.
+Hence this proposal which improves on this situation by offloading the problem to a dependency resolution which is then solved with Portage.
 
 Specification
 -------------
@@ -48,8 +50,7 @@ Inheriting the eclasses will add:
   to REQUIRED_USE.
 
 The eclasses export the pkg_setup function, in which they add an overlay
-for package-config inside `${T}/pkgconfig`, that will be prepended to the
-package-config environment variable `PKG_CONFIG_PATH`.
+for package-config inside `${T}/pkgconfig`, that will be prepended to the `PKG_CONFIG_PATH` environment variable.
 This variable will then in turn be exported globally.
 In the overlay directory the package-config file of the user-selected
 implementation will be linked to the generic name, i.e. `blas.pc` or
