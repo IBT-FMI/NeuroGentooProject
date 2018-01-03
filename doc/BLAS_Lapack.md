@@ -102,7 +102,7 @@ While appropriately addressing the currently most significant issues, the approa
   consistent implementation in all dependencies.
   Consider the figure below. The package P1 is dynamically linked against both D1 and D2, which pull a different BLAS implementation into the binary.
   The conflict is then carried out in the dynamic loader (ld.so).
-  It traverses the dependency tree and first loads the functions (symbols) from B1 to satisfy the dependencies of D1, and then goes on to load the functions from B2 which have the same name than the ones in B1 and therefore overwrite them.
+  The loader traverses the dependency tree and first loads the functions (symbols) from B1 to satisfy the dependencies of D1, and then goes on to load the functions from B2 which have the same name than the ones in B1 and therefore overwrite them.
   Hence only one implementation is effectively loaded, but since all functions that should be present for P1 are present, the program P1 will still run.
 
 ![BLAS conflict](graph/BLAS_Conflict.png)

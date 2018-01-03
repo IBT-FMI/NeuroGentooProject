@@ -3,8 +3,6 @@ Build Server
 
 ![The layout of the BuildServer. The user runs exec.sh providing up to 3 parameters. The exec.sh script first sources a standardized .gentoo-ID (via the getID utility function) corresponding to the .gentoo-directory selected by the user, and subsequently executes all scripts within the corresponding scripts directory. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
 
-!!! I corrected this here but check again for anthropomorphizing f software (scripts don't ask other scripts) and "folder".
-
 The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes (e.g. to Docker or OpenStack formats) of these systems.
 
 The functionality of the BuildServer is accessed via the `exec.sh` script, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [type]`

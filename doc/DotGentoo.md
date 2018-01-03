@@ -11,9 +11,8 @@ While this approach is reasonable for most cases, as it enforces some structure 
 Namely, when distributing the Ebuild alongside the software.
 The canonical approach to add a single Ebuild to the set of known packages is be to create a new directory, copy the Ebuild to the directory, and integrate the directory into the Gentoo system (as an overlay), by manually editing at least one system configuration file.
 
-!!! You need to make the connection between implicit overlay handling and the fact that we are talking about very-life software, meaning that this no longer just fetched live stuff from upstream, but uses the livest stuff from the user/developer's computer
-
-A more convenient model is to distribute an Ebuild and provide a way to install it with a single command, based on the current state of the projects working directory (including non-commited changes).
+Whilst being unnecessarily arduous, it also does not address that a developer might want to install not only the newest publically available version of the software, but the developers local version with not yet published changes.
+A more convenient model would distribute the Ebuild with the software *and* provide a way to install it with a single command, based on the current state of the projects working directory (including non-commited changes).
 Since not all information needed to install the software is contained inside the Ebuild, it is necessary to:
 
 * specify additional overlays needed to resolve additional Ebuild dependencies which are not included in the main portage tree (but rather in e.g. the Science Overlay, as FSL or AFNI are)
@@ -21,7 +20,7 @@ Since not all information needed to install the software is contained inside the
 
 This metadata, though contained, should not be added automatically to a users Gentoo Linux, since it has a large effect on the rest of the system.
 Hence, the metadata handling in particular should not be done without the users explicit consent or without user interaction.
-!!! Better separate what is done automatically and what is done manually.
+Installation of the package and setting up the temporary overlay however may be safely done automatically.
 
 Layout
 ------

@@ -22,8 +22,7 @@ To install a software package using the .gentoo standard, the user has to clone 
 
 ### Installation of the Metadata
 
-!!! Please no second person addressing
-In the .gentoo-directory, do the following: 
+In the .gentoo-directory, the following has to be done: 
 
 1. Copy the package files:
 	```bash
@@ -40,7 +39,7 @@ In the .gentoo-directory, do the following:
 	```
 Now one can safely execute the `./install.sh` script.
 
-The reason why metadata installation is not handled automatically, is that it represents a significant change to the users Gentoo Linux system, which should not be done without user interaction.
+The reason why metadata installation is not handled automatically, is that it represents a significant change to the users Gentoo Linux system, which should not be done without user interaction or consent.
 
 Gentoo Prefix Installations
 ---------------------------
