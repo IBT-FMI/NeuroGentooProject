@@ -11,7 +11,7 @@ digraph{
 		Chain[shape="note", label="hooks/<command>/chain"];
 	}
 	subgraph cluster1{
-		label="BuildServer";
+		label="BuildServer files";
 		Exec[shape="note",label="exec.sh"];
 		Config1[label="config/"];
 		Main[label="scripts/<type>/<command>/"];

@@ -87,6 +87,6 @@ src_unpack() {
 The `install.sh` script additionally sets up a temporary overlay inside the .gentoo directory, builds the Ebuild manifest and executes emerge with the first Ebuild it finds under .gentoo.
 The command line arguments passed to `install.sh` are forwarded to emerge.
 
-The script does *not* install any overlay or package mask, use, keyword or unmask file. The user is required to do that manually, for the reasons mentioned under (!!! link to motiv section).
+The script does *not* install any overlay or package mask, use, keyword or unmask file. The user is required to do that manually.
 
 [PMS]: https://dev.gentoo.org/~ulm/pms/head/pms.html "Package Manager Specification"

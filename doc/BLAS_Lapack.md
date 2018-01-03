@@ -46,7 +46,7 @@ Inheriting the eclasses will add:
 - a USE flag for every compatible implementation to IUSE
 - the dependency to the package providing the selected implementation to DEPEND and RDEPEND
 - the constraint that only one single implementation USE flag may be set 
-  to REQUIRED_USE. This variable holds boolean constraints for the USE flags. For example, `^^ (blas_a blas_b)` is an XOR constraint, evaluating to true if and only if either `blas_a` or `blas_b` are enabled.
+  to REQUIRED_USE. This variable holds Boolean constraints for the USE flags. For example, `^^ (blas_a blas_b)` is an XOR constraint, evaluating to true if and only if either `blas_a` or `blas_b` are enabled.
 
 The build-process will refer to the package-config program (`pkg-config`) to inquire the correct BLAS or LAPACK library. Therefore, we must ensure that any call to `pkg-config` returns the proper library.
 Package-config is invoked `pkg-config --libs <name>`, and it returns the libraries needed to link against the package `<name>` (in this case, `<name>` is one of blas, cblas, lapack or lapacke).
