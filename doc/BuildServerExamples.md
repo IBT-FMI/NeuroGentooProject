@@ -1,25 +1,27 @@
 BuildServer Case Examples
 =========================
 
-Setting up a Docker Image Build Server
---------------------------------------
+Setting up a Continuous Integration Testing Image
+-------------------------------------------------
 
 Software is often thoroughly tested after any change has been made to its source code (Continuous Integration, CI).
 There are numerous methods of testing, but a popular method are test-suites:
 a collection of small test-cases that check whether the software fulfills certain demands.
 
-Increasingly, these test-cases do not get executed on the developers computer but on a
+Increasingly, these test-cases do not get executed on the developers' computers but on a
 single-purpose virtual machine instantiated for the sole purpose of testing new source code versions.
-A popular infrastructure doing this is Travis CI and GitHub.
+A popular infrastructure doing this is Travis CI (which seamlessly integrates wit GitHub).
 
 ![The usual Travis CI and GitHub workflow](graph/TravisCI.png)
 
 Prerequisites:
 
-* A repository with a .gentoo folder, and we assume it is placed in the root of the repository.
+* A repository with a .gentoo directory compliant with the aforementioned specification placed in the root of the repository (!!!for the current example github chymera repositorg will eb used).
 * A BuildServer instance.
+* A continuous integration platform supporting custom image submission (the current example uses TravisCI, which supports custom docker images via a Docker-in-Docker infrastructure) 
+* An image storage infrastructure (the current example uses DockerHub, the foremost storage infrastructure for Docker images)
 
-
+!!! This is going to be more difficult, but do try to formulate the following sections without “we” and “you”
 ### Docker Hub
 
 First of all, we need to provide a repository for the Docker image.
@@ -32,6 +34,7 @@ It will be named with the scheme youruser/reponame
 ### Travis CI
 
 On the Travis side, we need to set-up the .travis.yml in the right way.
+!!! Descrbe in words what the right way is, i.e. what you are doing.
 
 ```
 before_install:
@@ -48,7 +51,7 @@ script:
 
 ### BuildServer
 
-We need to instantiate the BuildServer image first:
+First we need to instantiate the single-purpose image via the BuildServer:
 
 * `cd /path/to/build/server`
 * `./exec.sh /path/to/repository/.gentoo/ initialize`
@@ -63,11 +66,13 @@ a Docker image and upload it to Docker Hub.
 * `cp example_hooks/docker_image/post/30-upload_dockerimage.sh roots/$ID/hooks/docker_image/post/`
 * Adapt the variables in `roots/$ID/hooks/docker_image/post/30-upload_dockerimage.sh`
 
-Now the command `docker login dockerhub.com` has to be used to add the Docker Hub account credentials to the local Docker server
+Now the command `docker login dockerhub.com` has to be manually executed from the command line, in order to add the Docker Hub account credentials to the local Docker server 
+!!! Don't you mean to the build server?
 
 To upload this image for the first time now, execute
 `./exec.sh /path/to/repository/.gentoo update`
 If all goes well, a new image should be uploaded to the Docker Hub account.
+!!! Will this automatically add the upload process to the cron system? if so, specify
 
 Generating and uploading OpenStack images
 -----------------------------------------
@@ -76,10 +81,11 @@ The BuildServer includes a command to generate OpenStack images, but uploading h
 
 ### Prerequisites
 
-* An account at a OpenStack host
+* An account at a OpenStack host (the current example uses the University of Zurich ScienceCloud platform, though there are no idiosyncrasies referenced). 
 * An instantiated BuildServer
 
 ### BuildServer
+!!! Please regularize this section with the Docker section, if parts of the instructions are identical they should also be formatted identically.
 
 * Instantiate the image with `exec.sh </path/to/.gentoo> initialize`
 * Copy the example hook for OpenStack upload from `example_hooks/openstack_image/60-upload_image.sh` to the newly generated `roots/<ID>/hooks/openstack_image/post/`

@@ -2,6 +2,7 @@ Build Server
 ============
 
 ![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
+!!! Please explain/reference (since you already explained it) what getID is, and why it gets its own node shape.
 
 The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes of these systems.
 !!! what do you mean by format changes?
