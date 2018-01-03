@@ -70,13 +70,14 @@
 	\end{abstract}
 	\section{Introduction}
 		Current empirical research is generally - and particularly in the case of neuroscience - contingent on the execution of complex software pipelines for modeling and statistical analysis (e.g. General Linear Modelling, Independent Component Analysis, etc.).
-		The software needed to execute and dynamically construct such pipelines, in turn relies on more software, generally resulting in a very large dependency graph.
+		The software needed to execute and dynamically construct such pipelines, in turn relies on more software, generally resulting in a very large dependency graph (see the dependency graph of an actual package in Figure \ref{fig:real_depgraph}).
 		Trees do not suffice, since the dependencies will most likely contain loops, even for simple programs. A basic example are C compilers, that depend on an already compiled libc, forming the cycle compiler $\leftrightarrows$ libc.
 
-		\begin{figure}[H]
+		\begin{figure}[h]
 			\centering
 			\includegraphics[width=0.75\linewidth]{graph/Real_Dependencygraph/RealDepgraph2.png}
-			\caption{The dependency graph of the SAMRI package developed at the Institute for Biomedical Technology (IBT), with nodes representing software packages and edges representing dependency relationships.  The green edges in the upper right corner project from SAMRI to its direct dependency packages.}
+			\caption[The dependency graph of the SAMRI package]{The dependency graph of the SAMRI package developed at the Institute for Biomedical Technology (IBT), with nodes representing software packages and edges representing dependency relationships.  The green edges in the upper right corner project from SAMRI to its direct dependency packages.}
+			\label{fig:real_depgraph}
 		\end{figure}
 		
 		Hence, package managers are employed to do the dependency resolution.

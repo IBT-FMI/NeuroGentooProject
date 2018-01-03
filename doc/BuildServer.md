@@ -31,7 +31,7 @@ Why Bash?
 
 Bash has some properties that make it useful in the context of building images:
 
-* It allows easy creation of processes and redirection of their input/output streams to different sources/sinks. This is especially useful since image-building is very process-heavy (i.e. most of the tasks are solely: execute program A, then program B, etc.).
+* It allows easy creation of processes and redirection of their input and output streams to different sources or sinks. This is especially useful since image-building is very process-heavy (i.e. most of the tasks are solely: execute program A, then program B, etc.).
 * It is widely understood; many people can write shell-scripts at least to a certain degree.
 * It provides error-handling primitives which can stop the execution of scripts when any subprogram fails.
 
@@ -139,10 +139,9 @@ There are two types of hooks:
 
 ### Pre and Post Hooks
 
-Image building commands can be extended by prepending or appending additional scripts placed in the relevant "hooks" directories: `roots/<ID>/hooks/<command>/pre`
-and `roots/<ID>/hooks/<command>/post`.
-Everything in `pre` gets executed before the scripts in `hooks/<command>/<machinetype>`, 
-everything in `post` afterwords.
+Image building commands can be extended by prepending or appending additional scripts placed in the relevant "hooks" directories:
+* `roots/<ID>/hooks/<command>/pre/`: These scripts get executed before the BuildServer scripts 
+* `roots/<ID>/hooks/<command>/post/`: These get executed after the BuildServer scripts
 
 ### Command Chaining
 
