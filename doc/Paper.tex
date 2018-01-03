@@ -69,16 +69,24 @@
 		and virtual machines\footnote{OpenStack}
 	\end{abstract}
 	\section{Introduction}
-		Empirical research, especially in neuroscience, is often based on a complex pipeline of software doing some sort of statistics, and in the context of neurology often also image processing and transformation.
+		Empirical research, especially in neuroscience, is often based on a complex pipeline of software doing statistical analysis (Pearson's r, Independent Component Analysis, \ldots), and in the context of biomedical imaging often also image processing and transformation.
 		This software will depend on more software, constructing a usually large dependency graph\footnote{Trees do not suffice, since the dependencies will most likely contain loops, even for simple programs. A basic example are C compilers, that depend on an already compiled libc, forming the cycle compiler $\leftrightarrows$ libc}.
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.75\linewidth]{graph/Real_Dependencygraph/RealDepgraph2.png}
+			\caption{An actual dependency graph of the SAMRI package developed at the Institute for Biomedical Technology (IBT). The green lines in the upper right corner connect to the SAMRI packages.}
+		\end{figure}
 		
 		Hence, package managers are employed to do the dependency resolution.
 		One of these managers is Portage, used by Gentoo Linux and derivatives.
-		Its key-feature are source-based packages, i.e. packages not based on pre-compiled binary tarballs but on recipes (called Ebuilds) on how to obtain, build and test the software, as well as a list of its dependencies.
+		Its key-feature are source-based packages, i.e. packages not based on pre-compiled binary archives but on recipes (called Ebuilds) on how to obtain, build and test the software, as well as a list of its dependencies.
 		This has advantages over other approaches:
 		\begin{enumerate}
 			\item Ebuilds are easy to write, since they are straight-forward text files written in Bash and nice documentation
 			\item Ebuilds are usually easily updated to a new version just by increasing the version number in the Ebuild.
+			\item Ebuilds allow for a better integration of live and pre-release packages, i.e. work on the most recent code versions.
+			This allows for better upstreaming of user patches, since the user is working on the same version as the developers.
 			\item The resulting programs are optimized by the compiler to run as efficiently as possible on the machine they are deployed on\footnote{Binary distributions like Debian Linux have binaries compiled to run reasonably fast on \emph{all} machines, which might not always be the fastest way for your specific machine}
 		\end{enumerate}
 		

@@ -1,6 +1,8 @@
 Build Server
 ============
 
+![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
+
 The BuildServer is a infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes of these systems.
 
 Its user-interface resides in the script `exec.sh`, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [machinetype]`
@@ -13,7 +15,6 @@ Each Gentoo-System is stored in a directory `$PWD/roots/<ID>/root/`.
 * `stemgentoo`
 * An ID corresponding to the `.gentoo`-directory the image is based off
 
-![The layout of the BuildServer. The user starts exec.sh with parameters, which executes all scripts within the corresponding scripts folder. These scripts work on the image in roots/<ID>](graph/BuildServer.png)
 
 Prerequisites
 -------------
