@@ -16,63 +16,61 @@ A popular infrastructure doing this is Travis CI (which seamlessly integrates wi
 
 Prerequisites:
 
-* A repository with a .gentoo directory compliant with the aforementioned specification placed in the root of the repository (!!!for the current example github chymera repositorg will eb used).
+* A repository with a .gentoo directory compliant with the aforementioned specification placed in the root of the repository .
 * A BuildServer instance.
 * A continuous integration platform supporting custom image submission (the current example uses TravisCI, which supports custom docker images via a Docker-in-Docker infrastructure) 
 * An image storage infrastructure (the current example uses DockerHub, the foremost storage infrastructure for Docker images)
 
-!!! This is going to be more difficult, but do try to formulate the following sections without “we” and “you”
 ### Docker Hub
 
-First of all, we need to provide a repository for the Docker image.
-This is usually Docker Hub, but can be adapted to any other storage method.
+First of all, a repository has to be created for the Docker image.
+This is usually done on Docker Hub, but can be adapted to any other storage method.
 
-To do this, you need a Docker Hub account, and create a repository there.
-It will be named with the scheme youruser/reponame 
+Henceforth only Docker Hub is considered.
+A Docker Hub account is required, and a new repository has to be added there. It will have the naming-scheme someuser/reponame 
 
 
 ### Travis CI
 
-On the Travis side, we need to set-up the .travis.yml in the right way.
-!!! Descrbe in words what the right way is, i.e. what you are doing.
+On the Travis side, we need to set-up the .travis.yml in the right way, such that the Travis CI machine first fetches the Docker image from Docker Hub, starts the image, updates it and then installs the actual software and runs tests on it.
 
 ```
 before_install:
-  - docker pull buffepva/repositorg
-  - docker create --name "repositorg" --rm -ti -v "${PWD}":/home/repositorg buffepva/repositorg
-  - docker start repositorg
-  - docker exec repositorg emaint sync -a
-  - docker exec repositorg /home/repositorg/.gentoo/install.sh -o
+  - docker pull someuser/reponame
+  - docker create --name "reponame" --rm -ti -v "${PWD}":/home/reponame someuser/reponame
+  - docker start reponame
+  - docker exec reponame emaint sync -a
+  - docker exec reponame /home/reponame/.gentoo/install.sh -o
 install:
-  - docker exec repositorg sh -c 'FEATURES="-test" /home/repositorg/.gentoo/install.sh'
+  - docker exec reponame sh -c 'FEATURES="-test" /home/reponame/.gentoo/install.sh'
 script:
-  - docker exec repositorg sh -c 'FEATURES="test" /home/repositorg/.gentoo/install.sh'
+  - docker exec reponame sh -c 'FEATURES="test" /home/reponame/.gentoo/install.sh'
 ```
 
 ### BuildServer
 
-First we need to instantiate the single-purpose image via the BuildServer:
+On the BuildServer the single-purpose image has to be instantiated first:
 
-* `cd /path/to/build/server`
-* `./exec.sh /path/to/repository/.gentoo/ initialize`
+* `cd /path/to/build/server/roots/../`
+* `exec.sh /path/to/repository/.gentoo/ initialize`
 
 This creates a new root with id `$ID`
 
-Then we need to set-up that after every update the BuildServer must build
-a Docker image and upload it to Docker Hub.
+Then the hooks need to be set-up, such that after every update the BuildServer builds a Docker image and uploads it to Docker Hub.
 
 * `mkdir roots/$ID/hooks/docker_image/post/ roots/$ID/hooks/update/`
 * `echo docker_image >> roots/$ID/hooks/update/chain`
 * `cp example_hooks/docker_image/post/30-upload_dockerimage.sh roots/$ID/hooks/docker_image/post/`
 * Adapt the variables in `roots/$ID/hooks/docker_image/post/30-upload_dockerimage.sh`
 
-Now the command `docker login dockerhub.com` has to be manually executed from the command line, in order to add the Docker Hub account credentials to the local Docker server 
-!!! Don't you mean to the build server?
+Now the command `docker login dockerhub.com` has to be manually executed from the command line, in order to add the Docker Hub account credentials to the BuildServers Docker service.
 
-To upload this image for the first time now, execute
-`./exec.sh /path/to/repository/.gentoo update`
+To upload this image for the first time, either `exec.sh /path/to/repository/.gentoo update` or `exec.sh /path/to/repository/.gentoo docker_image` can be called
 If all goes well, a new image should be uploaded to the Docker Hub account.
-!!! Will this automatically add the upload process to the cron system? if so, specify
+
+### Periodic Builds
+
+To periodically upload a new image, refer to the Periodic Updates section in the BuildServer chapter.
 
 Generating and uploading OpenStack images
 -----------------------------------------
@@ -81,23 +79,29 @@ The BuildServer includes a command to generate OpenStack images, but uploading h
 
 ### Prerequisites
 
-* An account at a OpenStack host (the current example uses the University of Zurich ScienceCloud platform, though there are no idiosyncrasies referenced). 
+* An account at a OpenStack host.
 * An instantiated BuildServer
 
 ### BuildServer
-!!! Please regularize this section with the Docker section, if parts of the instructions are identical they should also be formatted identically.
 
-* Instantiate the image with `exec.sh </path/to/.gentoo> initialize`
-* Copy the example hook for OpenStack upload from `example_hooks/openstack_image/60-upload_image.sh` to the newly generated `roots/<ID>/hooks/openstack_image/post/`
-* Adapt the necessary variables in `60-upload_image.sh`
-* Add the `openstack_image` to the update-chain, i.e.
-	```
-	echo openstack_image >> roots/<ID>/hooks/update/chain
-	```
+First, the image has to be instantiated (alternatively, the stemgentoo can be used)
+
+* `cd /path/to/build/server/roots/../`
+* `exec.sh /path/to/repository/.gentoo/ initialize`
+
+Then the hooks need to be set-up, such that after every update the BuildServer builds an OpenStack image and uploads it to the OpenStack server.
+
+* `mkdir roots/$ID/hooks/docker_image/post/ roots/$ID/hooks/update/`
+* `echo openstack_image >> roots/$ID/hooks/update/chain`
+* `cp example_hooks/openstack_image/60-upload_image.sh roots/$ID/hooks/openstack_image/post/`
+* Adapt the variables in `roots/$ID/hooks/openstack_image/post/60-upload_image.sh`
+
+### Periodic Builds
+
+To periodically upload a new image, refer to the Periodic Updates section in the BuildServer chapter.
 
 ### Configuration
-With the variable `OPENSTACK_FILESYSTEM=<FS>` one can configure the file system used by the OpenStack images.
-
+With the variable `OPENSTACK_FILESYSTEM=<FS>` the file system used by the OpenStack images can be configured.
 Note: `mkfs.<FS>` has to exist, and extlinux must work with it, since it is used as a bootloader on the image.
 
 Additionally `OPENSTACK_FILESYSTEM_OPTS` can be set to pass parameters to `mkfs.<FS>`

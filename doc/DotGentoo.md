@@ -71,8 +71,6 @@ This is a design choice as much as it is a design limitation, since the flexibil
 The install.sh Script
 ---------------------
 
-!!! I understand that there is good reason for not shipping the install.sh script with the .gentoo standard information (simply because the install.sh is a standard utility and not part of the varibale space covered by the standard) but it seems to me that we curretnly lack a seamless avenue for distribution of this file (i.e. the Buildserver assumes it can find it in the .gentoo directory). So maybe this script needs to be included in the layout overview as well.
-
 The .gentoo directory includes an install.sh script.
 The Ebuild has to be adapted slightly such that it does not install the software version given by the sources in `SRC_URI`, `EGIT_REPO_URI` or equivalent, but uses the local files.
 To achieve this, the `install.sh` script works in conjunction with the Ebuild.
