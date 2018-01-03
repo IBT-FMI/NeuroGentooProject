@@ -66,7 +66,7 @@ Hence, it is generated as the sha512-sum of the following UTF8 byte stream:
 
 This yields an ID which is reasonably robust to changes outside the Ebuild.
 However, any slight (even syntactical) change to the Ebuild will affect the ID drastically.
-This is a design choice as much as it is a design limitation, since the flexibility which has to be guaranteed in an ebuild cannot be reconciled with standardized semantic parsing.
+This is a design choice as much as it is a design limitation, since the flexibility which has to be guaranteed in an Ebuild cannot be reconciled with standardized semantic parsing.
 
 The install.sh Script
 ---------------------
@@ -74,7 +74,7 @@ The install.sh Script
 The .gentoo directory includes an install.sh script.
 The Ebuild has to be adapted slightly such that it does not install the software version given by the sources in `SRC_URI`, `EGIT_REPO_URI` or equivalent, but uses the local files.
 To achieve this, the `install.sh` script works in conjunction with the Ebuild.
-In the script, an environment variable (`DOTGENTOO_PACKAGE_ROOT`) is exported, and the ebuild copies whatever is inside the directory inside this variable to its working directory.
+In the script, an environment variable (`DOTGENTOO_PACKAGE_ROOT`) is exported, and the Ebuild copies whatever is inside the directory inside this variable to its working directory.
 
 ```bash
 src_unpack() {

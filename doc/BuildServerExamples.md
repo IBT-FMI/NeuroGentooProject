@@ -18,8 +18,8 @@ Prerequisites:
 
 * A repository with a .gentoo directory compliant with the aforementioned specification placed in the root of the repository .
 * A BuildServer instance.
-* A continuous integration platform supporting custom image submission (the current example uses TravisCI, which supports custom docker images via a Docker-in-Docker infrastructure) 
-* An image storage infrastructure (the current example uses DockerHub, the foremost storage infrastructure for Docker images)
+* A continuous integration platform supporting custom image submission (the current example uses Travis CI, which supports custom docker images via a Docker-in-Docker infrastructure) 
+* An image storage infrastructure (the current example uses Docker Hub, the foremost storage infrastructure for Docker images)
 
 ### Docker Hub
 
@@ -60,7 +60,10 @@ Then the hooks need to be set-up, such that after every update the BuildServer b
 
 * `mkdir roots/$ID/hooks/docker_image/post/ roots/$ID/hooks/update/`
 * `echo docker_image >> roots/$ID/hooks/update/chain`
-* `cp example_hooks/docker_image/post/30-upload_dockerimage.sh roots/$ID/hooks/docker_image/post/`
+* 
+	```
+	cp example_hooks/docker_image/post/30-upload_dockerimage.sh roots/$ID/hooks/docker_image/post/
+	```
 * Adapt the variables in `roots/$ID/hooks/docker_image/post/30-upload_dockerimage.sh`
 
 Now the command `docker login dockerhub.com` has to be manually executed from the command line, in order to add the Docker Hub account credentials to the BuildServers Docker service.
@@ -93,7 +96,10 @@ Then the hooks need to be set-up, such that after every update the BuildServer b
 
 * `mkdir roots/$ID/hooks/docker_image/post/ roots/$ID/hooks/update/`
 * `echo openstack_image >> roots/$ID/hooks/update/chain`
-* `cp example_hooks/openstack_image/60-upload_image.sh roots/$ID/hooks/openstack_image/post/`
+* 
+	```
+	cp example_hooks/openstack_image/60-upload_image.sh roots/$ID/hooks/openstack_image/post/
+	```
 * Adapt the variables in `roots/$ID/hooks/openstack_image/post/60-upload_image.sh`
 
 ### Periodic Builds

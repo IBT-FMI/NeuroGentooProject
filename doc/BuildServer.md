@@ -5,7 +5,7 @@ Build Server
 
 The BuildServer is an infrastructure that generates Gentoo Linux images, based on a collection of shell-scripts that automate the creation, maintenance and format changes (e.g. to Docker or OpenStack formats) of these systems.
 
-The functionality of the BuildServer is accessed via the `exec.sh` script, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [machinetype]`
+The functionality of the BuildServer is accessed via the `exec.sh` script, which parses the command-line parameters `exec.sh </path/to/.gentoo or stemgentoo> <command> [type]`
 
 The image roots and metadata for the images are always stored in the folder `roots` relative to the current working directory.
 To store them in a specific directory, a directory change (`cd`) is required prior to running `exec.sh`.
@@ -21,8 +21,8 @@ Prerequisites
 -------------
 
 * Bash version >=4.2
-* [dracut](https://dracut.wiki.kernel.org/index.php/Main_Page) for openstack images
-* [syslinux](http://www.syslinux.org/) for openstack images
+* [dracut](https://dracut.wiki.kernel.org/index.php/Main_Page) for OpenStack images
+* [syslinux](http://www.syslinux.org/) for OpenStack images
 * Portage
 * Python
 
@@ -69,13 +69,13 @@ Commands
 --------
 
 The commands are defined in the `scripts/` directory. To execute `command` for
-a machine of type `machinetype` `exec.sh </path/to/.gentoo> <command> <machinetype>` is invoked.
-This results in all scripts in `scripts/command/machinetype/` being executed in lexical order.
+a machine of type `type` `exec.sh </path/to/.gentoo> <command> <type>` is invoked.
+This results in all scripts in `scripts/command/type/` being executed in lexical order.
 
 Scripts
 -------
 
-Scripts are executable bash scripts stored in `scripts/command/machinetype/`.
+Scripts are executable bash scripts stored in `scripts/command/type/`.
 If their name ends in `.chroot`, the BuildServer will chroot to the corresponding image
 before executing the commands, otherwise the BuildServer will source them and execute the command in the host machines context
 
@@ -88,7 +88,7 @@ The scripts have access to certain environment and global variables:
 
 * `STAGE`: The current command executed, e.g. `update`
 * `MACHINE`: The image ID currently being processed
-* `MACHINETYPE`: The machine type of the current image, e.g. `stemgentoo`
+* `MACHINETYPE`: The type of the current image, e.g. `stemgentoo` or `default`
 * `ROOT`: The absolute directory to the image root
 * Anything exported (or for non-chrooted scripts globally defined) variables in the configuration files.
 * Global or exported variables from previously executed scripts.
@@ -101,7 +101,7 @@ Error Handling
 Error handling is provided within the shell.
 Command failures are tracked with `trap <func> ERR`, meaning that as soon as any command ends with a non-zero exit status, the shell jumps to the function `<func>`
 
-The BuildServer sets up such a function (`error_exit`), that evaluates and executes strings stored inside a stack datastructure.
+The BuildServer sets up such a function (`error_exit`), that evaluates and executes strings stored inside a stack data structure.
 If for example a file should be deleted on error, one can add the string `"rm ${FILE}"` to this stack.
 This can be done with a convenience function `on_error "<str>"`, that pushes the string `<str>` to the error-handling stack.
 By using a stack, it is ensured that the last pushed command will be executed first.
