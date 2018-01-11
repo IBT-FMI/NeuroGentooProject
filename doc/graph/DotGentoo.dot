@@ -3,6 +3,7 @@ graph{
 	
 	node[shape="folder"];
 	dotgentoo[label=".gentoo"];
+	install[shape="note", label="install.sh", style="dashed"];
 	package_mask[label="package.mask"];
 	package_unmask[label="package.unmask"];
 	package_use[label="package.use"];
@@ -18,6 +19,7 @@ graph{
 	file5;
 	file6;
 	ebuild[label="pkg-99999.ebuild"];
+	dotgentoo -- install:n[style="dashed"];
 	dotgentoo -- overlays:n;
 	overlays -- file5:n;
 	overlays -- file6:n;
