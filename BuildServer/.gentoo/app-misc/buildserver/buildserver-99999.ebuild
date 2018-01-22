@@ -33,7 +33,7 @@ src_install() {
 	cat >buildserver <<-EOF
 #!/bin/sh
 
-exec /usr/share/buildserver/exec.sh "$@"
+exec /usr/share/buildserver/exec.sh "\$@"
 EOF
 	dobin buildserver
 	insopts "-m0755"
