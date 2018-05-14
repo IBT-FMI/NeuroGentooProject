@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "WARNING! This script is documented to potentially break Portage. See https://github.com/IBT-FMI/NeuroGentooProject/issues/16 for further details. Edit the script to proceed only if you know what you are doing."
+
+exit 1
+
 if [ "$1" == "-h" -o "$1" == "--help" ]
 then
 	echo "Usage: $0 [group] [prefix-directory] [start-script]"
