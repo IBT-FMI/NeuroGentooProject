@@ -3,18 +3,14 @@ set -e
 
 EPREFIX=${1:-$HOME/gentoo/}
 
-mkdir .debug
 mkdir ${EPREFIX}/etc/portage/repos.conf
 
 echo ""
 echo "Preparing Environment:"
 echo "~~~~~~~~~~~~~~~~~~~~~~"
-export FEATURES="-news"
 echo 'ACCEPT_KEYWORDS="~amd64"' >> ${EPREFIX}/etc/portage/make.conf
 echo 'ACCEPT_LICENSE="*"' >> ${EPREFIX}/etc/portage/make.conf
-echo 'EMERGE_DEFAULT_OPTS="--quiet-build"' >> ${EPREFIX}/etc/portage/make.conf
-emerge --sync >> .debug/emerge_sync.txt
-emerge -n dev-vcs/git wgetpaste eix gentoolkit
+emerge -n dev-vcs/git 
 cat <<-EOF >> "${EPREFIX}/etc/portage/repos.conf"
 
 [science]
@@ -24,7 +20,6 @@ sync-uri = https://github.com/gentoo-science/sci.git
 priority = 7777
 EOF
 emaint sync --repo science
-emaint sync --repo neurogentoo 
 eix-update
 
 #Link to the workaroud we reproduce in this section : https://wiki.gentoo.org/wiki/User_talk:Houseofsuns#Migration_to_science_overlay_from_main_tree
