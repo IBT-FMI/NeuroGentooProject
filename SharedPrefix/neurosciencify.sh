@@ -17,6 +17,14 @@ emerge --sync >> .debug/emerge_sync.txt
 emerge -n dev-vcs/git wgetpaste eix gentoolkit
 cat <<-EOF >> "${EPREFIX}/etc/portage/repos.conf"
 
+[neurogentoo]
+location = ${EPREFIX}/var/repos/neurogentoo
+sync-type = git
+sync-uri = https://github.com/TheChymera/neurogentoo.git
+priority=8888
+EOF
+cat <<-EOF >> "${EPREFIX}/etc/portage/repos.conf"
+
 [science]
 location = ${EPREFIX}/var/repos/science
 sync-type = git
