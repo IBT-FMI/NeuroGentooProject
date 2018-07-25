@@ -47,7 +47,7 @@ Prefix installations are full Gentoo Linux installations that reside somewhere i
 It can be understood as a kind of virtual machine *without* the strict encapsulation from guest to host, but also without the usual virtualization overhead.
 
 Gentoo Prefix is installed with a script that leads the user through the whole process and requires only minimal interaction at the beginning.
-This script can be downloaded from the Gentoo developer page at <https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh>
+This script can be downloaded from the Gentoo developer page at <https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-prefix.sh>
 
 Usage of the .gentoo directory is simliar to Bare-Metal installations, except that the Portage configuration no longer resides in `/etc`, but in the prefix directory, which is `$HOME/gentoo/etc/portage/` by default
 

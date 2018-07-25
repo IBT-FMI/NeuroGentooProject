@@ -29,6 +29,6 @@ EPREFIX="${1:-${SCRATCH}/gentoo}"
 
 prepare_euler
 cd "$SCRATCH"
-wget "https://dev.gentoo.org/~heroxbd/bootstrap-rap.sh"
-chmod a+x bootstrap-rap.sh
-./bootstrap-rap.sh "${EPREFIX}" "noninteractive"
+wget "https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-prefix.sh"
+chmod a+x bootstrap-prefix.sh
+./bootstrap-prefix.sh "${EPREFIX}" "noninteractive"
