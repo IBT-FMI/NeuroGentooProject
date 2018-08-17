@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-if $1 == "eprefix"; then
-	EPREFIX=${1:-$HOME/gentoo/}
-else
-	EPREFIX=""
-fi
+EPREFIX="${1}"
 
-mkdir ${EPREFIX}/etc/portage/repos.conf
+mkdir ${EPREFIX}/etc/portage/repos.conf || echo "There already exists a ${EPREFIX}/etc/portage/repos.conf directory."
 
 echo ""
 echo "Preparing Environment:"
@@ -15,8 +11,8 @@ echo "~~~~~~~~~~~~~~~~~~~~~~"
 echo 'ACCEPT_KEYWORDS="~amd64"' >> ${EPREFIX}/etc/portage/make.conf
 echo 'ACCEPT_LICENSE="*"' >> ${EPREFIX}/etc/portage/make.conf
 emerge -n dev-vcs/git 
-cat <<-EOF >> "${EPREFIX}/etc/portage/repos.conf"
-
+if [ ! -f "${EPREFIX}/etc/portage/repos.conf/science" ]; then
+cat <<-EOF >> "${EPREFIX}/etc/portage/repos.conf/science"
 [science]
 location = ${EPREFIX}/var/repos/science
 sync-type = git
@@ -25,4 +21,4 @@ priority = 7777
 EOF
 emaint sync --repo science
 eix-update
-./lapack-sci.sh
+./lapack-sci.sh ${EPREFIX}
