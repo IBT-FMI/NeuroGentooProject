@@ -8,7 +8,7 @@ EPREFIX=${1}
 echo ""
 echo "Setting Up Eselect for Gentoo Science:"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-cp ".gentoo/files/sci-lapack" "${EPREFIX}/etc/portage/package.mask/"
+cp "sci-lapack" "${EPREFIX}/etc/portage/package.mask/"
 emerge --oneshot --verbose dev-util/cmake >> /dev/null
 emerge --oneshot --verbose app-admin/eselect::science >> /dev/null
 FEATURES="-preserve-libs":$FEATURES emerge --oneshot --verbose sci-libs/blas-reference::science
